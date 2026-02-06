@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository, IsNull } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 
@@ -16,6 +16,7 @@ export class CommentsService {
       content,
       user: { id: userId },
       episode: { id: episodeId },
+      parentComment: parentId ? { id: parentId } : null,
     };
 
     if (parentId) {
@@ -28,8 +29,8 @@ export class CommentsService {
 
   async findByEpisode(episodeId: string) {
     return await this.commentRepository.find({
-      where: { episode: { id: episodeId } },
-      relations: ['user'],
+      where: { episode: { id: episodeId }, parentComment: IsNull() },
+      relations: ['user', 'replies', 'replies.user'],
       order: { createdAt: 'DESC' },
     });
   }
