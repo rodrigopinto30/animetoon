@@ -18,6 +18,9 @@ const user_entity_1 = require("./users/entities/user.entity");
 const auth_module_1 = require("./auth/auth.module");
 const comics_module_1 = require("./comics/comics.module");
 const comic_entity_1 = require("./comics/entities/comic.entity");
+const episode_entity_1 = require("./comics/entities/episode.entity");
+const comments_module_1 = require("./comments/comments.module");
+const comment_entity_1 = require("./comments/entities/comment.entity");
 let AppModule = class AppModule {
     constructor() {
         console.log('--- APP MODULE CARGADO Y CONECTANDO A DB ---');
@@ -38,7 +41,7 @@ exports.AppModule = AppModule = __decorate([
                     username: config.get('DATABASE_USER'),
                     password: config.get('DATABASE_PASSWORD'),
                     database: config.get('DATABASE_NAME'),
-                    entities: [user_entity_1.User, comic_entity_1.Comic],
+                    entities: [user_entity_1.User, comic_entity_1.Comic, episode_entity_1.Episode, comment_entity_1.Comment],
                     synchronize: true,
                     logging: true,
                     logger: 'advanced-console',
@@ -48,6 +51,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             comics_module_1.ComicsModule,
+            comments_module_1.CommentsModule,
         ],
     }),
     __metadata("design:paramtypes", [])

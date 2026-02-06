@@ -6,6 +6,9 @@ import { User } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { ComicsModule } from './comics/comics.module';
  import { Comic } from './comics/entities/comic.entity'; 
+import { Episode } from './comics/entities/episode.entity';
+import { CommentsModule } from './comments/comments.module';
+import { Comment } from './comments/entities/comment.entity';
  
 @Module({
   imports: [
@@ -20,7 +23,7 @@ import { ComicsModule } from './comics/comics.module';
         username: config.get<string>('DATABASE_USER'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME'),
-        entities: [User, Comic], 
+        entities: [User, Comic, Episode, Comment], 
         synchronize: true, 
         logging: true, 
         logger: 'advanced-console',
@@ -30,6 +33,7 @@ import { ComicsModule } from './comics/comics.module';
     UsersModule,
     AuthModule,
     ComicsModule,
+    CommentsModule,
   ],
 })
 export class AppModule {

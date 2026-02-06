@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const comic_entity_1 = require("./entities/comic.entity");
+const episode_entity_1 = require("./entities/episode.entity");
 let ComicsService = class ComicsService {
     comicRepository;
-    constructor(comicRepository) {
+    episodeRepository;
+    constructor(comicRepository, episodeRepository) {
         this.comicRepository = comicRepository;
+        this.episodeRepository = episodeRepository;
     }
     async create(createComicDto, user) {
         const newComic = this.comicRepository.create({
@@ -29,11 +32,42 @@ let ComicsService = class ComicsService {
         });
         return await this.comicRepository.save(newComic);
     }
+    async createEpisode(comicId, episodeData) {
+        const episode = this.episodeRepository.create({
+            ...episodeData,
+            comic: { id: comicId }
+        });
+        return await this.episodeRepository.save(episode);
+    }
+    async findAll() {
+        return await this.comicRepository.find({
+            relations: ['author'],
+            order: { createdAt: 'DESC' }
+        });
+    }
+    async findOne(id) {
+        const comic = await this.comicRepository.findOne({
+            where: { id },
+            relations: ['author', 'episodes']
+        });
+        if (!comic) {
+            throw new common_1.NotFoundException(`Comic con ID ${id} no encontrado`);
+        }
+        return comic;
+    }
+    async findEpisodeById(id) {
+        return await this.episodeRepository.findOne({
+            where: { id },
+            relations: ['comments', 'comments.user'],
+        });
+    }
 };
 exports.ComicsService = ComicsService;
 exports.ComicsService = ComicsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(comic_entity_1.Comic)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(episode_entity_1.Episode)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository])
 ], ComicsService);
 //# sourceMappingURL=comics.service.js.map

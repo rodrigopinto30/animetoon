@@ -1,5 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { OneToMany } from 'typeorm';
+import { Episode } from './episode.entity';
 
 @Entity('comics')
 export class Comic {
@@ -20,7 +22,10 @@ export class Comic {
 
   @CreateDateColumn()
   createdAt: Date;
-
+  
   @ManyToOne(() => User, (user) => user.id)
   author: User;
+
+  @OneToMany(() => Episode, (episode) => episode.comic)
+  episodes: Episode[];
 }
