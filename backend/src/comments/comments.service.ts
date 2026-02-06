@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import { InjectRepository, IsNull } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 
 @Injectable()
