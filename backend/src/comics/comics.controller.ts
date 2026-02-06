@@ -58,7 +58,6 @@ export class ComicsController {
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
     
-    console.log('Archivos recibidos:', files); 
   
     if (!files || files.length === 0) {
       return { message: 'No se recibieron archivos. Revisa el campo "pages" en Postman', paths: [] };

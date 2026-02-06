@@ -11,6 +11,7 @@ import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/entities/comment.entity';
 import { FavoritesModule } from './favorites/favorites.module';
 import { RatingsModule } from './ratings/ratings.module';
+import { NotificationsModule } from './notifications/notifications.module';
  
 @Module({
   imports: [
@@ -38,10 +39,8 @@ import { RatingsModule } from './ratings/ratings.module';
     CommentsModule,
     FavoritesModule,
     RatingsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {
-  constructor() {
-    console.log('--- APP MODULE CARGADO Y CONECTANDO A DB ---');
-  }
 }
