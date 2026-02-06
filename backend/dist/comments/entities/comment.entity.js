@@ -9,55 +9,49 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Comic = void 0;
+exports.Comment = void 0;
 const typeorm_1 = require("typeorm");
 const user_entity_1 = require("../../users/entities/user.entity");
-const typeorm_2 = require("typeorm");
-const episode_entity_1 = require("./episode.entity");
-let Comic = class Comic {
+const episode_entity_1 = require("../../comics/entities/episode.entity");
+let Comment = class Comment {
     id;
-    title;
-    description;
-    coverImage;
-    genre;
+    content;
     createdAt;
-    author;
-    episodes;
+    user;
+    episode;
+    parentComment;
+    replies;
 };
-exports.Comic = Comic;
+exports.Comment = Comment;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
-], Comic.prototype, "id", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Comic.prototype, "title", void 0);
+], Comment.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text' }),
     __metadata("design:type", String)
-], Comic.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], Comic.prototype, "coverImage", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ default: 'action' }),
-    __metadata("design:type", String)
-], Comic.prototype, "genre", void 0);
+], Comment.prototype, "content", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], Comic.prototype, "createdAt", void 0);
+], Comment.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.id),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
     __metadata("design:type", user_entity_1.User)
-], Comic.prototype, "author", void 0);
+], Comment.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_2.OneToMany)(() => episode_entity_1.Episode, (episode) => episode.comic),
+    (0, typeorm_1.ManyToOne)(() => episode_entity_1.Episode, (episode) => episode.comments, { onDelete: 'CASCADE' }),
+    __metadata("design:type", episode_entity_1.Episode)
+], Comment.prototype, "episode", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => Comment, (comment) => comment.replies, { nullable: true }),
+    __metadata("design:type", Comment)
+], Comment.prototype, "parentComment", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => Comment, (comment) => comment.parentComment),
     __metadata("design:type", Array)
-], Comic.prototype, "episodes", void 0);
-exports.Comic = Comic = __decorate([
-    (0, typeorm_1.Entity)('comics')
-], Comic);
-//# sourceMappingURL=comic.entity.js.map
+], Comment.prototype, "replies", void 0);
+exports.Comment = Comment = __decorate([
+    (0, typeorm_1.Entity)('comments')
+], Comment);
+//# sourceMappingURL=comment.entity.js.map

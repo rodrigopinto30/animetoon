@@ -6,21 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ComicsModule = void 0;
+exports.CommentsModule = void 0;
 const common_1 = require("@nestjs/common");
+const comments_service_1 = require("./comments.service");
+const comments_controller_1 = require("./comments.controller");
 const typeorm_1 = require("@nestjs/typeorm");
-const comic_entity_1 = require("./entities/comic.entity");
-const comics_service_1 = require("./comics.service");
-const comics_controller_1 = require("./comics.controller");
-const episode_entity_1 = require("./entities/episode.entity");
-let ComicsModule = class ComicsModule {
+const comment_entity_1 = require("./entities/comment.entity");
+let CommentsModule = class CommentsModule {
 };
-exports.ComicsModule = ComicsModule;
-exports.ComicsModule = ComicsModule = __decorate([
+exports.CommentsModule = CommentsModule;
+exports.CommentsModule = CommentsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([comic_entity_1.Comic, episode_entity_1.Episode])],
-        providers: [comics_service_1.ComicsService],
-        controllers: [comics_controller_1.ComicsController],
+        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment])],
+        providers: [comments_service_1.CommentsService],
+        controllers: [comments_controller_1.CommentsController]
     })
-], ComicsModule);
-//# sourceMappingURL=comics.module.js.map
+], CommentsModule);
+//# sourceMappingURL=comments.module.js.map
