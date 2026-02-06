@@ -9,6 +9,7 @@ import { ComicsModule } from './comics/comics.module';
 import { Episode } from './comics/entities/episode.entity';
 import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/entities/comment.entity';
+import { FavoritesModule } from './favorites/favorites.module';
  
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { Comment } from './comments/entities/comment.entity';
     AuthModule,
     ComicsModule,
     CommentsModule,
+    FavoritesModule,
   ],
 })
 export class AppModule {
