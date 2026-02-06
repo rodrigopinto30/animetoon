@@ -2,12 +2,13 @@ import { Injectable, NotFoundException, UnauthorizedException} from '@nestjs/com
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { Comment } from './entities/comment.entity';
-
+import { NotificationsService } from '../notifications/notifications.service'; 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(content: string, userId: string, episodeId: string, parentId?: string) {
@@ -23,8 +24,26 @@ export class CommentsService {
       commentData.parentComment = { id: parentId };
     }
 
-    const comment = this.commentRepository.create(commentData);
-    return await this.commentRepository.save(comment);
+    const comment = await this.commentRepository.save(
+      this.commentRepository.create(commentData)
+    );
+
+    if (parentId) {
+      const parent = await this.commentRepository.findOne({
+        where: { id: parentId },
+        relations: ['user'],
+      });
+
+      if (parent && parent.user.id !== userId) {
+        await this.notificationsService.createNotification(
+          parent.user.id,
+          `Alguien respondió a tu comentario en el episodio.`,
+          'reply'
+        );
+      }
+    }
+
+    return comment;
   }
 
   async findByEpisode(episodeId: string) {
