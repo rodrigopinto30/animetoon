@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { Comic } from './entities/comic.entity';
 import { Episode } from './entities/episode.entity';
 
@@ -27,13 +27,6 @@ export class ComicsService {
     return await this.episodeRepository.save(episode);
   }
 
-  async findAll(): Promise<Comic[]>{
-    return await this.comicRepository.find({
-      relations: ['author'],
-      order: {createdAt: 'DESC'}
-    })
-  }
-
   async findOne(id: string): Promise<Comic>{
     const comic = await this.comicRepository.findOne({
       where: {id},
@@ -52,5 +45,22 @@ export class ComicsService {
       where: { id },
       relations: ['comments', 'comments.user'], 
     });
+  }
+
+  async findAll(title?: string, genre?: string) {
+    const query = this.comicRepository.createQueryBuilder('comic')
+      .leftJoinAndSelect('comic.author', 'author'); 
+
+    if (title) {
+      query.andWhere('comic.title LIKE :title', { title: `%${title}%` });
+    }
+
+    if (genre) {
+      query.andWhere('comic.genre = :genre', { genre });
+    }
+
+    query.orderBy('comic.createdAt', 'DESC');
+
+    return await query.getMany();
   }
 }
