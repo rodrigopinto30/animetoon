@@ -47,7 +47,7 @@ export class ComicsService {
     });
   }
 
-  async findAll(title?: string, genre?: string) {
+  async findAll(title?: string, genre?: string, page: number = 1, limit: number = 10) {
     const query = this.comicRepository.createQueryBuilder('comic')
       .leftJoinAndSelect('comic.author', 'author'); 
 
@@ -59,8 +59,21 @@ export class ComicsService {
       query.andWhere('comic.genre = :genre', { genre });
     }
 
-    query.orderBy('comic.createdAt', 'DESC');
+    const skip = (page - 1) * limit;
 
-    return await query.getMany();
+    query.orderBy('comic.createdAt', 'DESC')
+      .take(limit)
+      .skip(skip);
+
+    const [items, total] = await query.getManyAndCount();
+
+    return {
+      items,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    }
   }
+
+
 }
