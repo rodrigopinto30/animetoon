@@ -1,9 +1,25 @@
-import Image from "next/image";
+import ComicGallery from "@/components/ComicGallery"; // Asegúrate de que la ruta sea correcta
 
 export default function Home() {
   return (
-    <div>
-      <main>Animetoon</main>
-    </div>
+    <main className="min-h-screen bg-background">
+      {/* Header Sencillo */}
+      <header className="border-b">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold tracking-tight text-primary">
+            Animetoon
+          </h1>
+          <nav className="space-x-4">
+            <span className="text-sm font-medium text-muted-foreground">
+              Explorar
+            </span>
+          </nav>
+        </div>
+      </header>
+
+      <div className="container mx-auto">
+        <ComicGallery />
+      </div>
+    </main>
   );
 }

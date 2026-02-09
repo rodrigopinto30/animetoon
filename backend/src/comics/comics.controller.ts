@@ -68,7 +68,7 @@ export class ComicsController {
     return this.comicsService.findEpisodeById(id);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.AUTHOR, Role.ADMIN, Role.READER)
   @Get() 
   async findAll(
