@@ -28,12 +28,11 @@ export const getComics = async (filters: { title?: string, genre?: string, page?
     }
   });
 
-  if (!response.ok) throw new Error('Error al cargar cómics');
-
   if (!response.ok) {
-  const errorData = await response.json();
-  console.error("Detalle del error:", errorData);
-  throw new Error(`Error ${response.status}: ${errorData.message}`);
-}
+    const errorData = await response.json();
+    console.error("Detalle del error:", errorData);
+    throw new Error(`Error ${response.status}: ${errorData.message}`);
+  }
+  
   return response.json();
 };
