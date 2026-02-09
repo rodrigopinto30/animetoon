@@ -12,7 +12,9 @@ import { Comment } from './comments/entities/comment.entity';
 import { FavoritesModule } from './favorites/favorites.module';
 import { RatingsModule } from './ratings/ratings.module';
 import { NotificationsModule } from './notifications/notifications.module';
- 
+import { Favorite } from './favorites/entities/favorite.entity';
+import { Rating } from './ratings/entities/rating.entity';
+ import { Notification } from './notifications/entities/notification.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -26,7 +28,7 @@ import { NotificationsModule } from './notifications/notifications.module';
         username: config.get<string>('DATABASE_USER'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME'),
-        entities: [User, Comic, Episode, Comment], 
+        entities: [User, Comic, Episode, Comment, Favorite, Rating, Notification],
         synchronize: true, 
         logging: true, 
         logger: 'advanced-console',
