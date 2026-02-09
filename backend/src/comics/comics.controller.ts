@@ -1,5 +1,5 @@
 
-import { Get, Controller, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
+import { Get, Controller, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ComicsService } from './comics.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -13,13 +13,6 @@ import { extname } from 'path';
 @Controller('comics')
 export class ComicsController {
   constructor(private readonly comicsService: ComicsService) {}
-
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-    @Roles(Role.AUTHOR, Role.ADMIN, Role.READER)
-    @Get() 
-    async findAll() {
-      return this.comicsService.findAll();
-  }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
@@ -73,5 +66,15 @@ export class ComicsController {
   @Get('episodes/:id')
   async findEpisode(@Param('id') id: string) {
     return this.comicsService.findEpisodeById(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.AUTHOR, Role.ADMIN, Role.READER)
+  @Get() 
+  async findAll(
+    @Query('title') title?: string,
+    @Query('genre') genre?: string
+  ) {
+    return this.comicsService.findAll(title, genre);
   }
 }
