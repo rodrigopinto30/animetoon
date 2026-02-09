@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -43,5 +43,20 @@ export class UsersService {
     .addSelect('user.password')
     .where('user.email = :email', { email })
     .getOne();
-}
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favorites', 'favorites.comic', 'notifications'],
+    });
+
+    if (!user) {
+      throw new NotFoundException("Usuario no encontrado");
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    
+    return userWithoutPassword;
+  }
 }
