@@ -73,8 +73,10 @@ export class ComicsController {
   @Get() 
   async findAll(
     @Query('title') title?: string,
-    @Query('genre') genre?: string
+    @Query('genre') genre?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
   ) {
-    return this.comicsService.findAll(title, genre);
+    return this.comicsService.findAll(title, genre, Number(page), Number(limit));
   }
 }
