@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { getComicById, Comic } from "@/services/api";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function ComicDetailPage() {
   const params = useParams();
@@ -43,6 +46,18 @@ export default function ComicDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="absolute top-6 left-6 z-30">
+        <Link href="/">
+          <Button
+            variant="outline"
+            size="sm"
+            className="cursor-pointer bg-background/50 backdrop-blur-md border-none hover:bg-background/80 transition-all"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver a la Galería
+          </Button>
+        </Link>
+      </div>
       <div className="relative h-[450px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10" />
         <img
@@ -84,6 +99,47 @@ export default function ComicDetailPage() {
             <p className="font-bold text-muted-foreground uppercase">Idioma</p>
             <p>Español</p>
           </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-10">
+        <div className="flex items-center justify-between border-b pb-4 mb-6">
+          <h2 className="text-3xl font-black italic tracking-tighter">
+            EPISODIOS
+          </h2>
+          <span className="text-sm text-muted-foreground uppercase font-bold">
+            Total: 3 Capítulos
+          </span>
+        </div>
+
+        <div className="grid gap-3">
+          {[1, 2, 3].map((num) => (
+            <div
+              key={num}
+              className="group flex items-center justify-between p-4 rounded-xl border bg-card hover:border-primary/50 hover:bg-secondary/20 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded bg-secondary flex items-center justify-center font-bold text-lg group-hover:text-primary transition-colors">
+                  {num}
+                </div>
+                <div>
+                  <p className="font-bold">
+                    Capítulo {num}: El despertar del poder
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Publicado hace 2 días
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                Leer
+              </Button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
