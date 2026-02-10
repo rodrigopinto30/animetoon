@@ -14,7 +14,7 @@ import { extname } from 'path';
 export class ComicsController {
   constructor(private readonly comicsService: ComicsService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Param('id') id: string){
     return this.comicsService.findOne(id)
