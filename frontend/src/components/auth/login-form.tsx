@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { login } from "@/services/api";
+import { useRouter } from "next/navigation";
 import { useForm, ControllerRenderProps } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginValues } from "@/lib/validations/auth";
@@ -22,13 +25,23 @@ import {
 } from "@/components/ui/card";
 
 export function LoginForm() {
+  const router = useRouter();
+  const [serverError, setServerError] = useState<string | null>(null);
+
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (values: LoginValues) => {
-    console.log(values);
+    setServerError(null);
+    try {
+      await login(values);
+      router.push("/");
+      router.refresh();
+    } catch (error: any) {
+      setServerError("Credenciales incorrectas o error de servidor.");
+    }
   };
 
   return (
@@ -44,6 +57,12 @@ export function LoginForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {serverError && (
+              <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md text-center">
+                {serverError}
+              </div>
+            )}
+
             <FormField
               control={form.control}
               name="email"

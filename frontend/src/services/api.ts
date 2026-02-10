@@ -1,3 +1,5 @@
+import { LoginValues } from "@/lib/validations/auth";
+
 export interface Comic {
   id: string;
   title: string;
@@ -47,4 +49,24 @@ export const getComicById = async (id: string): Promise<Comic> => {
 
   if (!response.ok) throw new Error('No se pudo encontrar el cómic');
   return response.json();
+};
+
+export const login = async (credentials: LoginValues) => {
+  const response = await fetch('http://localhost:3001/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    throw new Error('Credenciales inválidas');
+  }
+
+  const data = await response.json();
+  
+  if (data.access_token) {
+    localStorage.setItem('token', data.access_token);
+  }
+  
+  return data;
 };
