@@ -36,3 +36,15 @@ export const getComics = async (filters: { title?: string, genre?: string, page?
   
   return response.json();
 };
+
+export const getComicById = async (id: string): Promise<Comic> => {
+  const response = await fetch(`http://localhost:3001/comics/${id}`, {
+    cache: 'no-store',
+    headers: {
+        'Accept': 'application/json',
+      },
+  });
+
+  if (!response.ok) throw new Error('No se pudo encontrar el cómic');
+  return response.json();
+};
