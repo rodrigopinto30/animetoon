@@ -68,8 +68,9 @@ export const login = async (credentials: LoginValues) => {
 if (data.access_token) {
     Cookies.set('token', data.access_token, { 
       expires: 7,
-      secure: true,
-      sameSite: 'strict' 
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      sameSite: 'lax' 
     });
     localStorage.setItem('token', data.access_token);
   }
