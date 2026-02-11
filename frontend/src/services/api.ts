@@ -1,4 +1,5 @@
 import { LoginValues } from "@/lib/validations/auth";
+import { ComicDetail } from "@/lib/validations/comic";
 import Cookies from 'js-cookie';
 
 export interface Comic {
@@ -40,17 +41,30 @@ export const getComics = async (filters: { title?: string, genre?: string, page?
   return response.json();
 };
 
-export const getComicById = async (id: string): Promise<Comic> => {
-  const response = await fetch(`http://localhost:3001/comics/${id}`, {
-    cache: 'no-store',
-    headers: {
-        'Accept': 'application/json',
-      },
-  });
+export const getComicById = async (id: string, token?: string): Promise<ComicDetail> => {
+  try {
+    const headers: HeadersInit = {};
 
-  if (!response.ok) throw new Error('No se pudo encontrar el cómic');
-  return response.json();
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`http://backend:3001/comics/${id}`, {
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error(`API ERROR ${response.status}`);
+    }
+    return response.json();
+
+  } catch (error) {
+    // console.error("GET COMIC ERROR:", error);
+    throw error;
+  }
 };
+
 
 export const login = async (credentials: LoginValues) => {
   const response = await fetch('http://localhost:3001/auth/login', {
