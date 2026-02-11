@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "@/services/api";
 import { useRouter } from "next/navigation";
 import { useForm, ControllerRenderProps } from "react-hook-form";
@@ -27,7 +27,7 @@ import {
 export function LoginForm() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
-
+  const [isMounted, setIsMounted] = useState(false);
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -43,6 +43,12 @@ export function LoginForm() {
       setServerError("Credenciales incorrectas o error de servidor.");
     }
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
 
   return (
     <Card className="w-full max-w-md mx-auto">

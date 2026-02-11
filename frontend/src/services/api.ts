@@ -1,4 +1,5 @@
 import { LoginValues } from "@/lib/validations/auth";
+import Cookies from 'js-cookie';
 
 export interface Comic {
   id: string;
@@ -64,7 +65,12 @@ export const login = async (credentials: LoginValues) => {
 
   const data = await response.json();
   
-  if (data.access_token) {
+if (data.access_token) {
+    Cookies.set('token', data.access_token, { 
+      expires: 7,
+      secure: true,
+      sameSite: 'strict' 
+    });
     localStorage.setItem('token', data.access_token);
   }
   
