@@ -1,147 +1,112 @@
-"use client";
+import { ComicDetail } from "@/lib/validations/comic";
+import { getComicById } from "@/services/api";
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import Image from "next/image";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { getComicById, Comic } from "@/services/api";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-export default function ComicDetailPage() {
-  const params = useParams();
-  const id = params.id as string;
+export default async function ComicDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
-  const [comic, setComic] = useState<Comic | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const comic = await getComicById(id, token).catch(() => null);
 
-  useEffect(() => {
-    if (!id) return;
+  if (!comic) {
+    notFound();
+  }
 
-    const fetchDetail = async () => {
-      try {
-        setLoading(true);
-        const data = await getComicById(id);
-        setComic(data);
-      } catch (err) {
-        console.error(err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDetail();
-  }, [id]);
-
-  if (loading)
-    return <div className="p-20 text-center">Cargando detalles...</div>;
-  if (error || !comic)
-    return (
-      <div className="p-20 text-center text-red-500">
-        No se pudo cargar el cómic.
-      </div>
-    );
+  const imageSrc =
+    "https://fastly.picsum.photos/id/566/200/300.jpg?hmac=gDpaVMLNupk7AufUDLFHttohsJ9-C17P7L-QKsVgUQU";
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="absolute top-6 left-6 z-30">
-        <Link href="/">
-          <Button
-            variant="outline"
-            size="sm"
-            className="cursor-pointer bg-background/50 backdrop-blur-md border-none hover:bg-background/80 transition-all"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a la Galería
-          </Button>
-        </Link>
-      </div>
-      <div className="relative h-[450px] w-full overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-10" />
-        <img
-          src={comic.coverImage}
-          className="w-full h-full object-cover blur-md opacity-40"
-          alt="background"
-        />
+    <div className="container mx-auto p-6 space-y-10">
+      <section className="flex flex-col md:flex-row gap-10 items-start">
+        <div className="w-full md:w-80 shrink-0">
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={comic.title}
+              width={320}
+              height={426}
+              priority
+              className="w-full rounded-xl shadow-2xl object-cover aspect-[3/4]"
+            />
+          ) : (
+            <div className="w-full aspect-[3/4] bg-muted rounded-xl flex items-center justify-center">
+              <span className="text-muted-foreground text-sm">Sin portada</span>
+            </div>
+          )}
+        </div>
 
-        <div className="container mx-auto px-6 absolute inset-0 z-20 flex flex-col md:flex-row items-end pb-12 gap-8">
-          <img
-            src={comic.coverImage}
-            className="w-48 md:w-64 rounded-xl shadow-2xl border-4 border-background aspect-[2/3] object-cover"
-            alt={comic.title}
-          />
-          <div className="space-y-4 mb-4">
-            <Badge className="bg-primary hover:bg-primary/80">
-              {comic.genre}
-            </Badge>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter">
+        <div className="space-y-6 flex-1">
+          <div className="space-y-2">
+            <h1 className="text-5xl font-black tracking-tighter uppercase italic">
               {comic.title}
             </h1>
-            <p className="max-w-2xl text-muted-foreground text-lg line-clamp-3">
+            <div className="flex gap-2">
+              <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase">
+                {comic.genre || "General"}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold border-b pb-2">Sinopsis</h3>
+            <p className="text-muted-foreground text-lg leading-relaxed">
               {comic.description}
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-6 py-10">
-        <h2 className="text-2xl font-bold border-b pb-2 mb-6">
-          Información General
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
-          <div className="space-y-2">
-            <p className="font-bold text-muted-foreground uppercase">Estado</p>
-            <p>En publicación</p>
-          </div>
-          <div className="space-y-2">
-            <p className="font-bold text-muted-foreground uppercase">Idioma</p>
-            <p>Español</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-6 py-10">
-        <div className="flex items-center justify-between border-b pb-4 mb-6">
-          <h2 className="text-3xl font-black italic tracking-tighter">
-            EPISODIOS
-          </h2>
-          <span className="text-sm text-muted-foreground uppercase font-bold">
-            Total: 3 Capítulos
+      <section className="space-y-6">
+        <div className="flex items-center justify-between border-b pb-4">
+          <h2 className="text-3xl font-bold tracking-tight">Episodios</h2>
+          <span className="text-muted-foreground font-medium">
+            {comic.episodes?.length || 0} capítulos publicados
           </span>
         </div>
 
-        <div className="grid gap-3">
-          {[1, 2, 3].map((num) => (
-            <div
-              key={num}
-              className="group flex items-center justify-between p-4 rounded-xl border bg-card hover:border-primary/50 hover:bg-secondary/20 transition-all cursor-pointer"
-            >
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded bg-secondary flex items-center justify-center font-bold text-lg group-hover:text-primary transition-colors">
-                  {num}
-                </div>
-                <div>
-                  <p className="font-bold">
-                    Capítulo {num}: El despertar del poder
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Publicado hace 2 días
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
+        {comic.episodes && comic.episodes.length > 0 ? (
+          <div className="grid gap-4">
+            {comic.episodes.map((episode) => (
+              <div
+                key={episode.id}
+                className="group flex items-center justify-between p-5 border rounded-xl hover:bg-accent/50 hover:border-primary/50 transition-all cursor-pointer"
               >
-                Leer
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
+                <div className="flex gap-6 items-center">
+                  <span className="text-3xl font-black text-muted-foreground/20 group-hover:text-primary/30 transition-colors italic w-12">
+                    #{episode.number}
+                  </span>
+                  <div>
+                    <h4 className="font-bold text-lg group-hover:text-primary transition-colors">
+                      {episode.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                      Publicado el{" "}
+                      {new Date(episode.releaseDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                  LEER AHORA
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center border-2 border-dashed rounded-2xl">
+            <p className="text-muted-foreground italic">
+              Próximamente: Nuevos episodios en camino.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
