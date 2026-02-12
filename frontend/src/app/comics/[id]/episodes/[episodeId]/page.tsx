@@ -1,4 +1,5 @@
-import { getEpisodeById } from "@/services/api";
+import ScrollToTop from "@/components/ScrollToTop";
+import { getComicById, getEpisodeById } from "@/services/api";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,9 +14,17 @@ export default async function EpisodeViewerPage({ params }: PageProps) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
-  const episode = await getEpisodeById(episodeId, token).catch(() => null);
+  const [episode, comic] = await Promise.all([
+    getEpisodeById(episodeId, token).catch(() => null),
+    getComicById(id, token).catch(() => null),
+  ]);
 
-  if (!episode) notFound();
+  if (!episode || !comic) notFound();
+
+  const currentIndex = comic.episodes.findIndex((ep) => ep.id === episodeId);
+
+  const nextEpisode = comic.episodes[currentIndex + 1];
+  const nextEpisodeId = nextEpisode?.id;
 
   return (
     <div className="min-h-screen bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-slate-900">
@@ -72,17 +81,43 @@ export default async function EpisodeViewerPage({ params }: PageProps) {
         )}
       </main>
 
-      <footer className="p-16 bg-white/50 backdrop-blur-sm mt-10 border-t border-slate-200">
-        <div className="flex flex-col items-center gap-6">
-          <p className="text-slate-400 text-sm font-medium italic">
-            Has llegado al final del capítulo
-          </p>
-          <Link
-            href={`/comics/${id}`}
-            className="px-10 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-primary transition-all shadow-lg hover:shadow-primary/20 hover:-translate-y-1 active:scale-95"
-          >
-            FINALIZAR LECTURA
-          </Link>
+      <footer className="p-20 bg-white/50 backdrop-blur-sm mt-10 border-t border-slate-200">
+        <div className="flex flex-col items-center gap-8 max-w-2xl mx-auto">
+          <div className="text-center space-y-2">
+            <p className="text-slate-400 text-sm font-bold uppercase tracking-[0.2em]">
+              Fin del Capítulo {episode.number}
+            </p>
+            <h3 className="text-2xl font-black text-slate-800 italic uppercase">
+              {episode.title}
+            </h3>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+            <Link
+              href={`/comics/${id}`}
+              className="px-8 py-4 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-all text-center"
+            >
+              MENÚ DE CAPÍTULOS
+            </Link>
+
+            {nextEpisodeId ? (
+              <Link
+                href={`/comics/${id}/episodes/${nextEpisodeId}`}
+                className="px-10 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-primary transition-all shadow-xl hover:shadow-primary/20 hover:-translate-y-1 active:scale-95 text-center flex items-center justify-center gap-2 group"
+              >
+                SIGUIENTE CAPÍTULO
+                <span className="group-hover:translate-x-1 transition-transform">
+                  →
+                </span>
+              </Link>
+            ) : (
+              <div className="px-10 py-4 bg-slate-100 text-slate-400 font-bold rounded-2xl cursor-not-allowed">
+                PRÓXIMAMENTE
+              </div>
+            )}
+          </div>
+
+          <ScrollToTop />
         </div>
       </footer>
     </div>

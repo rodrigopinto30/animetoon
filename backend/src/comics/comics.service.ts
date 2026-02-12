@@ -30,7 +30,12 @@ export class ComicsService {
   async findOne(id: string): Promise<Comic>{
     const comic = await this.comicRepository.findOne({
       where: {id},
-      relations: ['author', 'episodes']
+      relations: ['author', 'episodes'],
+      order: {
+        episodes: {
+          createdAt: 'ASC'
+        }
+      }
     });
 
     if(!comic){
