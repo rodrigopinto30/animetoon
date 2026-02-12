@@ -1,5 +1,5 @@
 import { LoginValues } from "@/lib/validations/auth";
-import { ComicDetail } from "@/lib/validations/comic";
+import { ComicDetail, EpisodeDetail } from "@/lib/validations/comic";
 import Cookies from 'js-cookie';
 
 export interface Comic {
@@ -65,6 +65,20 @@ export const getComicById = async (id: string, token?: string): Promise<ComicDet
   }
 };
 
+export const getEpisodeById = async (episodeId: string, token?: string): Promise<EpisodeDetail> => {
+  const isServer = typeof window === 'undefined';
+  const baseUrl = isServer ? 'http://backend:3001' : 'http://backend:3001';
+
+  const response = await fetch(`${baseUrl}/comics/episodes/${episodeId}`, {
+    headers: {
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) throw new Error('No se pudo cargar el episodio');
+  return response.json();
+};
 
 export const login = async (credentials: LoginValues) => {
   const response = await fetch('http://localhost:3001/auth/login', {
