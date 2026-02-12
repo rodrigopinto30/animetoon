@@ -16,6 +16,18 @@ export interface Comic {
   genre?: string[];
 }
 
+export interface EpisodePage {
+  id: string;
+  imageUrl: string;
+  order: number;
+}
+export interface EpisodeDetail {
+  id: string;
+  number: number;
+  title: string;
+  releaseDate: string;
+  pages: EpisodePage[];
+}
 export interface ComicDetail extends Comic { 
   episodes: Episode[];
 }

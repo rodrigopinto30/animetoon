@@ -3,6 +3,7 @@ import { getComicById } from "@/services/api";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import Image from "next/image";
+import Link from "next/link"; // 1. Importamos Link
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -74,8 +75,9 @@ export default async function ComicDetailPage({ params }: PageProps) {
         {comic.episodes && comic.episodes.length > 0 ? (
           <div className="grid gap-4">
             {comic.episodes.map((episode) => (
-              <div
+              <Link
                 key={episode.id}
+                href={`/comics/${id}/episodes/${episode.id}`}
                 className="group flex items-center justify-between p-5 border rounded-xl hover:bg-accent/50 hover:border-primary/50 transition-all cursor-pointer"
               >
                 <div className="flex gap-6 items-center">
@@ -93,10 +95,10 @@ export default async function ComicDetailPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                   LEER AHORA
-                </button>
-              </div>
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
