@@ -27,6 +27,8 @@ export interface EpisodeDetail {
   title: string;
   releaseDate: string;
   pages: EpisodePage[];
+  nextEpisodeId?: string | null;
+  prevEpisodeId?: string | null;
 }
 export interface ComicDetail extends Comic { 
   episodes: Episode[];
