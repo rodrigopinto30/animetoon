@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Comic } from './entities/comic.entity';
 import { Episode } from './entities/episode.entity';
+import { Favorite } from '../favorites/entities/favorite.entity';
 
 @Injectable()
 export class ComicsService {
   constructor(
     @InjectRepository(Comic) private readonly comicRepository: Repository<Comic>,
     @InjectRepository(Episode) private readonly episodeRepository: Repository<Episode>,
+    @InjectRepository(Favorite) private readonly favoriteRepository: Repository<Favorite>
   ) {}
 
   async create(createComicDto: any, user: any) {
@@ -27,24 +29,34 @@ export class ComicsService {
     return await this.episodeRepository.save(episode);
   }
 
-  async findOne(id: string): Promise<Comic>{
+  async findOne(id: string, userId?: string) {
+    
     const comic = await this.comicRepository.findOne({
-      where: {id},
-      relations: ['author', 'episodes'],
-      order: {
-        episodes: {
-          createdAt: 'ASC'
-        }
-      }
+      where: { id },
+      relations: ['episodes'],
+      order: { episodes: { number: 'ASC' } }
     });
 
-    if(!comic){
-      throw new NotFoundException(`Comic con ID ${id} no encontrado`);
+    if (!comic) throw new NotFoundException('Comic no encontrado');
+
+    let isFavorite = false;
+
+    if (userId) {
+      const favorite = await this.favoriteRepository.findOne({
+        where: {
+          user: { id: userId },
+          comic: { id: id }
+        }
+      });
+      
+      isFavorite = !!favorite;
     }
 
-    return comic;
+    return {
+      ...comic,
+      isFavorite
+    };
   }
-
   async findEpisodeById(id: string) {
     return await this.episodeRepository.findOne({
       where: { id },

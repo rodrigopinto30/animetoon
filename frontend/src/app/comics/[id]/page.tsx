@@ -3,7 +3,8 @@ import { getComicById } from "@/services/api";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import Image from "next/image";
-import Link from "next/link"; // 1. Importamos Link
+import Link from "next/link";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -48,10 +49,16 @@ export default async function ComicDetailPage({ params }: PageProps) {
             <h1 className="text-5xl font-black tracking-tighter uppercase italic">
               {comic.title}
             </h1>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-3">
               <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase">
                 {comic.genre || "General"}
               </span>
+
+              <FavoriteButton
+                comicId={id}
+                initialIsFavorite={comic.isFavorite || false}
+                token={token}
+              />
             </div>
           </div>
 
