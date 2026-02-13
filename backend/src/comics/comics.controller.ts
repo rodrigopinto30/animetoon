@@ -1,5 +1,5 @@
 
-import { Get, Controller, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
+import { Get, Controller,Req, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ComicsService } from './comics.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -9,15 +9,20 @@ import { UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-
+import { JwtOptionalGuard } from '../auth/guards/jwt-optional.guard';
 @Controller('comics')
 export class ComicsController {
   constructor(private readonly comicsService: ComicsService) {}
 
-  // @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id') id: string){
-    return this.comicsService.findOne(id)
+  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtOptionalGuard)
+  async findOne(
+    @Param('id') id: string,
+    @Req() req: any
+  ){
+    const userId = req.user?.userId;
+    return this.comicsService.findOne(id, userId)
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

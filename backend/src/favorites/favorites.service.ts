@@ -11,22 +11,25 @@ export class FavoritesService {
   ) {}
 
   async toggleFavorite(userId: string, comicId: string) {
+    
     const existing = await this.favoriteRepository.findOne({
-      where: { user: { id: userId }, comic: { id: comicId } },
+      where: { 
+        user: { id: userId }, 
+        comic: { id: comicId } 
+      },
     });
 
     if (existing) {
       await this.favoriteRepository.remove(existing);
-      return { added: false };
+      return { favorited: false };
+    } else {
+      const newFavorite = this.favoriteRepository.create({
+        user: { id: userId },
+        comic: { id: comicId },
+      });
+      await this.favoriteRepository.save(newFavorite);
+      return { favorited: true };
     }
-
-    const newFavorite = this.favoriteRepository.create({
-      user: { id: userId },
-      comic: { id: comicId },
-    });
-    
-    await this.favoriteRepository.save(newFavorite);
-    return { added: true };
   }
 
   async getUserFavorites(userId: string) {
@@ -35,4 +38,5 @@ export class FavoritesService {
       relations: ['comic'], 
     });
   }
+
 }
