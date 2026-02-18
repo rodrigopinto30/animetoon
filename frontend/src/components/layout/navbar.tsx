@@ -2,18 +2,24 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Button } from "@/components/ui/button";
 import { BookOpen, User, Heart } from "lucide-react";
 import { LogoutButton } from "../LogoutButton";
 
 export function Navbar() {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<{ username: string; email: string } | null>(
+    null,
+  );
 
   useEffect(() => {
     setMounted(true);
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    console.log(savedUser);
   }, []);
 
   const token = mounted ? Cookies.get("token") : null;
@@ -43,28 +49,39 @@ export function Navbar() {
                       className="gap-2 cursor-pointer"
                     >
                       <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-                      <span className="hidden md:inline">Favoritos</span>
+                      <span className="hidden md:inline font-bold">
+                        Favoritos
+                      </span>
                     </Button>
                   </Link>
 
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <User className="h-4 w-4" />
-                    <span className="hidden md:inline">Mi Perfil</span>
-                  </Button>
+                  <Link href="/profile">
+                    <Button
+                      variant="ghost"
+                      className="flex items-center gap-3 px-3 py-2 h-auto hover:bg-primary/10 transition-all rounded-xl border border-transparent hover:border-primary/20 cursor-pointer"
+                    >
+                      <div className="bg-primary/20 p-2 rounded-lg">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="flex flex-col items-start leading-none gap-1">
+                        <span className="text-sm font-black italic uppercase tracking-tighter">
+                          {user?.username || "Usuario"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-medium">
+                          {user?.email || "Cargando..."}
+                        </span>
+                      </div>
+                    </Button>
+                  </Link>
+
                   <LogoutButton />
-                  {/* <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleLogout}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span className="hidden md:inline">Salir</span>
-                  </Button> */}
                 </div>
               ) : (
                 <Link href="/login">
-                  <Button size="sm" className="cursor-pointer">
+                  <Button
+                    size="sm"
+                    className="cursor-pointer font-bold uppercase italic tracking-tighter"
+                  >
                     Iniciar Sesión
                   </Button>
                 </Link>
