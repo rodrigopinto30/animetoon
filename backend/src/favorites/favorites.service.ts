@@ -33,10 +33,15 @@ export class FavoritesService {
   }
 
   async getUserFavorites(userId: string) {
-    return await this.favoriteRepository.find({
-      where: { user: { id: userId } },
-      relations: ['comic'], 
-    });
-  }
+  const favorites = await this.favoriteRepository.find({
+    where: { user: { id: userId } },
+    relations: ['comic'],
+  });
+
+  return favorites.map(fav => ({
+    ...fav.comic,
+    favoriteId: fav.id, 
+  }));
+}
 
 }
