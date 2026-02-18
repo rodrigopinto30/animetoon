@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, User } from "lucide-react";
+import { LogOut, BookOpen, User, Heart } from "lucide-react";
 
 export function Navbar() {
   const router = useRouter();
@@ -42,10 +42,22 @@ export function Navbar() {
             <>
               {token ? (
                 <div className="flex items-center gap-4">
+                  <Link href="/favorites">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2 cursor-pointer"
+                    >
+                      <Heart className="h-4 w-4 text-red-500 fill-red-500" />
+                      <span className="hidden md:inline">Favoritos</span>
+                    </Button>
+                  </Link>
+
                   <Button variant="ghost" size="sm" className="gap-2">
                     <User className="h-4 w-4" />
                     <span className="hidden md:inline">Mi Perfil</span>
                   </Button>
+
                   <Button
                     variant="destructive"
                     size="sm"
