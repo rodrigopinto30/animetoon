@@ -40,8 +40,15 @@ export function LoginForm() {
   const onSubmit = async (values: LoginValues) => {
     setServerError(null);
     try {
-      await login(values);
+      const response = await login(values);
       toast.success("¡Bienvenido de nuevo!");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: response.user.username,
+          email: response.user.email,
+        }),
+      );
       router.refresh();
       router.push("/");
     } catch (error: any) {
@@ -80,7 +87,6 @@ export function LoginForm() {
         )}
 
         <div className="space-y-4">
-          {/* Email Field */}
           <div className="space-y-1">
             <Label htmlFor="email">Correo Electrónico</Label>
             <Input
