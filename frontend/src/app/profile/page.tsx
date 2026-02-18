@@ -11,6 +11,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "La contraseña actual es obligatoria"),
+    newPassword: z.string().min(6, "Mínimo 6 caracteres"),
+    confirmNewPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmNewPassword"],
+  });
+
+type PasswordValues = z.infer<typeof passwordSchema>;
+
 const profileSchema = z.object({
   username: z.string().min(3, "Mínimo 3 caracteres"),
   email: z.string().email("Email inválido"),
@@ -29,6 +42,15 @@ export default function ProfilePage() {
     formState: { errors },
   } = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
+  });
+
+  const {
+    register: registerPass,
+    handleSubmit: handleSubmitPass,
+    reset: resetPass,
+    formState: { errors: passErrors },
+  } = useForm<PasswordValues>({
+    resolver: zodResolver(passwordSchema),
   });
 
   useEffect(() => {
@@ -52,6 +74,20 @@ export default function ProfilePage() {
       window.dispatchEvent(new Event("storage"));
     } catch (error) {
       toast.error("Error al actualizar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onUpdatePassword = async (values: PasswordValues) => {
+    setLoading(true);
+    try {
+      toast.success("Contraseña actualizada", {
+        description: "Tu seguridad es lo primero. ¡Todo listo!",
+      });
+      resetPass();
+    } catch (error) {
+      toast.error("Error al cambiar la contraseña");
     } finally {
       setLoading(false);
     }
@@ -132,7 +168,7 @@ export default function ProfilePage() {
               <div className="flex justify-end pt-4">
                 <Button
                   disabled={loading}
-                  className="font-bold px-8 h-12 gap-2"
+                  className="font-bold px-8 h-12 gap-2 cursor-pointer"
                 >
                   {loading ? (
                     <Loader2 className="animate-spin h-4 w-4" />
@@ -145,6 +181,81 @@ export default function ProfilePage() {
             </form>
           </div>
         </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="p-8 bg-background/40 backdrop-blur-md border rounded-3xl shadow-xl mt-8"
+      >
+        <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
+          <ShieldCheck className="text-primary h-5 w-5" />
+          <h3 className="text-xl font-bold uppercase tracking-tighter italic">
+            Seguridad
+          </h3>
+        </div>
+
+        <form
+          onSubmit={handleSubmitPass(onUpdatePassword)}
+          className="space-y-6"
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Contraseña Actual</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                {...registerPass("currentPassword")}
+                className={`bg-background/50 ${passErrors.currentPassword ? "border-red-500" : ""}`}
+              />
+              {passErrors.currentPassword && (
+                <p className="text-red-500 text-[10px] font-bold italic uppercase">
+                  {passErrors.currentPassword.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">Nueva Contraseña</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                {...registerPass("newPassword")}
+                className={`bg-background/50 ${passErrors.newPassword ? "border-red-500" : ""}`}
+              />
+              {passErrors.newPassword && (
+                <p className="text-red-500 text-[10px] font-bold italic uppercase">
+                  {passErrors.newPassword.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Confirmar Nueva</Label>
+              <Input
+                id="confirmNewPassword"
+                type="password"
+                {...registerPass("confirmNewPassword")}
+                className={`bg-background/50 ${passErrors.confirmNewPassword ? "border-red-500" : ""}`}
+              />
+              {passErrors.confirmNewPassword && (
+                <p className="text-red-500 text-[10px] font-bold italic uppercase">
+                  {passErrors.confirmNewPassword.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Button
+              variant="outline"
+              className="font-bold px-8 h-12 border-primary/20 hover:bg-primary/10 cursor-pointer"
+            >
+              ACTUALIZAR CONTRASEÑA
+            </Button>
+          </div>
+        </form>
       </motion.div>
     </div>
   );
