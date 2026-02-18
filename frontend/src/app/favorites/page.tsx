@@ -24,7 +24,7 @@ export default async function FavoritesPage() {
   const favorites = await getUserFavorites(token);
   console.log(favorites[0]);
   return (
-    <div className="p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold">Mis Favoritos ❤️</h1>
 
       {favorites.length === 0 ? (
