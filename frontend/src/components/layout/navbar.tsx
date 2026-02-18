@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, User, Heart } from "lucide-react";
+import { BookOpen, User, Heart } from "lucide-react";
+import { LogoutButton } from "../LogoutButton";
 
 export function Navbar() {
   const router = useRouter();
@@ -14,13 +15,6 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const handleLogout = () => {
-    Cookies.remove("token");
-    localStorage.removeItem("token");
-    router.push("/login");
-    router.refresh();
-  };
 
   const token = mounted ? Cookies.get("token") : null;
 
@@ -57,8 +51,8 @@ export function Navbar() {
                     <User className="h-4 w-4" />
                     <span className="hidden md:inline">Mi Perfil</span>
                   </Button>
-
-                  <Button
+                  <LogoutButton />
+                  {/* <Button
                     variant="destructive"
                     size="sm"
                     onClick={handleLogout}
@@ -66,7 +60,7 @@ export function Navbar() {
                   >
                     <LogOut className="h-4 w-4" />
                     <span className="hidden md:inline">Salir</span>
-                  </Button>
+                  </Button> */}
                 </div>
               ) : (
                 <Link href="/login">
