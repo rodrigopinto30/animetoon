@@ -110,6 +110,26 @@ if (data.access_token) {
   return data;
 };
 
+export const signup = async (userData: any) => {
+  const isServer = typeof window === 'undefined';
+  const baseUrl = isServer ? 'http://backend:3001' : 'http://localhost:3001';
+
+  const response = await fetch(`${baseUrl}/auth/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error en el registro');
+  }
+
+  return response.json();
+};
+
 export const toggleFavorite = async (comicId: string, token: string) => {
   const baseUrl = typeof window === 'undefined' ? 'http://backend:3001' : 'http://localhost:3001';
   
