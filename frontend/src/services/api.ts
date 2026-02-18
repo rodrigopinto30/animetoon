@@ -127,3 +127,19 @@ export const toggleFavorite = async (comicId: string, token: string) => {
     throw new Error('No se pudo actualizar favoritos');}
   return response.json();
 };
+
+export const getUserFavorites = async (token: string) => {
+  const isServer = typeof window === 'undefined';
+  const baseUrl = isServer ? 'http://backend:3001' : 'http://localhost:3001';
+
+  const response = await fetch(`${baseUrl}/favorites`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store', 
+  });
+  
+  if (!response.ok) return [];
+  return response.json();
+};

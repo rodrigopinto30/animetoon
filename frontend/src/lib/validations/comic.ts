@@ -10,7 +10,7 @@ export interface Comic {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  coverImage: string;
   author?: string;
   status?: 'ONGOING' | 'COMPLETED';
   genre?: string[];

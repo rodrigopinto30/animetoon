@@ -3,10 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { FavoritesService } from './favorites.service';
 
 @Controller('favorites')
+@UseGuards(AuthGuard('jwt'))
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Post(':comicId')
   async toggle(
     @Param('comicId') comicId: string,
@@ -21,7 +21,9 @@ export class FavoritesController {
     return this.favoritesService.toggleFavorite(idUsuario, comicId);
   }
   @Get()
-  async findAll(@Request() req) {
+  async findAll(@Req() req) {
     return this.favoritesService.getUserFavorites(req.user.userId);
   }
+
+  
 }
