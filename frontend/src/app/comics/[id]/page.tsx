@@ -25,7 +25,7 @@ export default async function ComicDetailPage({ params }: PageProps) {
     "https://fastly.picsum.photos/id/566/200/300.jpg?hmac=gDpaVMLNupk7AufUDLFHttohsJ9-C17P7L-QKsVgUQU";
 
   return (
-    <div className="container mx-auto p-6 space-y-10">
+    <div className="space-y-10">
       <section className="flex flex-col md:flex-row gap-10 items-start">
         <div className="w-full md:w-80 shrink-0">
           {imageSrc ? (

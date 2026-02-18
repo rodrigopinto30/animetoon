@@ -25,9 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="relative min-h-screen font-sans antialiased">
+        <div className="fixed inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
+          <div className="absolute inset-0 bg-gradient-to-tr from-background via-transparent to-background" />
+        </div>
         <Navbar />
         <main className="container mx-auto p-6 min-h-screen">{children}</main>
       </body>
