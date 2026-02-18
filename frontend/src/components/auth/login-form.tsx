@@ -1,39 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { login } from "@/services/api";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginValues } from "@/lib/validations/auth";
+import * as z from "zod";
+import { motion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { motion } from "framer-motion";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
-import { ControllerRenderProps, useForm } from "react-hook-form";
+import { Label } from "@/components/ui/label";
+import { login } from "@/services/api";
+
+const loginSchema = z.object({
+  email: z.string().email("Introduce un correo electrónico válido"),
+  password: z.string().min(1, "La contraseña es obligatoria"),
+});
+
+type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const form = useForm<LoginValues>({
+
+  const {
+    register,
+    handleSubmit,
+    resetField,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
@@ -42,13 +41,13 @@ export function LoginForm() {
     setServerError(null);
     try {
       await login(values);
-      router.push("/");
+      toast.success("¡Bienvenido de nuevo!");
       router.refresh();
+      router.push("/");
     } catch (error: any) {
-      setServerError("Credenciales incorrectas o error de servidor.");
-      toast.error("Credenciales incorrectas", {
-        description: "Por favor, verifica tu correo y contraseña.",
-      });
+      setServerError(error.message || "Credenciales incorrectas");
+      resetField("password");
+      toast.error("Error al entrar");
     }
   };
 
@@ -73,100 +72,92 @@ export function LoginForm() {
         </p>
       </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {serverError && (
-            <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-xl text-center border border-destructive/20">
-              {serverError}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({
-                field,
-              }: {
-                field: ControllerRenderProps<any, "email">;
-              }) => (
-                <FormItem>
-                  <FormLabel>Correo Electrónico</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="tu@email.com"
-                      type="email"
-                      className="bg-background/50"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({
-                field,
-              }: {
-                field: ControllerRenderProps<any, "password">;
-              }) => (
-                <FormItem>
-                  <FormLabel>Contraseña</FormLabel>
-                  <div className="relative">
-                    <FormControl>
-                      <Input
-                        placeholder="••••••••"
-                        type={showPassword ? "text" : "password"}
-                        className="bg-background/50 pr-10"
-                        {...field}
-                      />
-                    </FormControl>
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {serverError && (
+          <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-xl text-center border border-destructive/20 animate-shake">
+            {serverError}
           </div>
+        )}
 
-          <div className="flex flex-col gap-4">
-            <Button
-              type="submit"
-              className="w-full font-bold h-12"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "INICIANDO..." : "ENTRAR"}
-            </Button>
-
-            <div className="flex flex-col gap-2 text-center text-sm">
-              <Link
-                href="/forgot-password"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </Link>
-              <p className="text-muted-foreground">
-                ¿No tienes cuenta?{" "}
-                <Link
-                  href="/register"
-                  className="text-primary font-bold hover:underline"
-                >
-                  Regístrate aquí
-                </Link>
+        <div className="space-y-4">
+          {/* Email Field */}
+          <div className="space-y-1">
+            <Label htmlFor="email">Correo Electrónico</Label>
+            <Input
+              id="email"
+              {...register("email")}
+              placeholder="tu@email.com"
+              className={
+                errors.email
+                  ? "border-red-500 focus-visible:ring-red-500"
+                  : "bg-background/50"
+              }
+            />
+            {errors.email && (
+              <p className="text-red-500 text-[10px] font-black uppercase italic">
+                {errors.email.message}
               </p>
-            </div>
+            )}
           </div>
-        </form>
-      </Form>
+
+          <div className="space-y-1">
+            <Label htmlFor="password">Contraseña</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                placeholder="••••••••"
+                className={
+                  errors.password
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : "bg-background/50 pr-10"
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-[10px] font-black uppercase italic">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <Button
+            type="submit"
+            className="w-full font-bold h-12"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "INICIANDO..." : "ENTRAR"}
+          </Button>
+
+          <div className="flex flex-col gap-2 text-center text-sm">
+            <Link
+              href="/forgot-password"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+            <p className="text-muted-foreground">
+              ¿No tienes cuenta?{" "}
+              <Link
+                href="/register"
+                className="text-primary font-bold hover:underline"
+              >
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
+        </div>
+      </form>
     </motion.div>
   );
 }
