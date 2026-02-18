@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toggleFavorite } from "@/services/api";
+import { toast } from "sonner";
 
 interface FavoriteButtonProps {
   comicId: string;
@@ -22,17 +23,35 @@ export default function FavoriteButton({
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!token || isLoading) return;
+    if (!token) {
+      toast.error("Debes iniciar sesión", {
+        description: "Inicia sesión para guardar tus favoritos.",
+      });
+      return;
+    }
 
-    setIsLoading(true);
-    setIsFavorite(!isFavorite);
+    const nextState = !isFavorite;
+    setIsFavorite(nextState);
 
     try {
       await toggleFavorite(comicId, token);
+
+      if (nextState) {
+        toast.success("¡Añadido!", {
+          description: "El cómic se guardó en tu colección.",
+          icon: "❤️",
+        });
+      } else {
+        toast.info("Eliminado", {
+          description: "Se quitó de tu lista de favoritos.",
+          icon: "💔",
+        });
+      }
     } catch (error) {
-      setIsFavorite(isFavorite);
-    } finally {
-      setIsLoading(false);
+      setIsFavorite(!nextState);
+      toast.error("Error", {
+        description: "No se pudo actualizar tu preferencia.",
+      });
     }
   };
 
