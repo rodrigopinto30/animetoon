@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Comic } from './entities/comic.entity';
 import { Episode } from './entities/episode.entity';
 import { Favorite } from '../favorites/entities/favorite.entity';
+import { Role } from 'src/auth/enums/roles.enum';
 
 @Injectable()
 export class ComicsService {
@@ -92,5 +93,21 @@ export class ComicsService {
     }
   }
 
+async remove(id: string, user: any) {
+    const comic = await this.comicRepository.findOne({ 
+      where: { id },
+      relations: ['author']
+    });
 
+    if (!comic) {
+      throw new NotFoundException('Cómic no encontrado');
+    }
+
+    if (comic.author.id !== user.userId && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('No tienes permiso para eliminar este cómic');
+    }
+
+    await this.comicRepository.remove(comic);
+    return { message: 'Cómic eliminado con éxito' };
+  }
 }
