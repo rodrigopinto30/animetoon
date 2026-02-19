@@ -93,7 +93,7 @@ export class ComicsService {
     }
   }
 
-async remove(id: string, user: any) {
+  async remove(id: string, user: any) {
     const comic = await this.comicRepository.findOne({ 
       where: { id },
       relations: ['author']
@@ -109,5 +109,21 @@ async remove(id: string, user: any) {
 
     await this.comicRepository.remove(comic);
     return { message: 'Cómic eliminado con éxito' };
+  }
+
+  async update(id: string, updateComicDto: any, user: any) {
+    const comic = await this.comicRepository.preload({
+      id: id,
+      ...updateComicDto,
+    });
+
+    if (!comic) throw new NotFoundException('Cómic no encontrado');
+
+    const existingComic = await this.comicRepository.findOne({ where: { id }, relations: ['author'] });
+    if (existingComic.author.id !== user.userId && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('No tienes permiso para editar este cómic');
+    }
+
+    return this.comicRepository.save(comic);
   }
 }

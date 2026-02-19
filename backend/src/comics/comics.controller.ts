@@ -1,5 +1,5 @@
 
-import { Get, Controller,Req, Post, Body, Delete, UseGuards, Request, Param, Query } from '@nestjs/common';
+import { Get, Controller,Req, Post, Body, Delete, UseGuards, Patch, Request, Param, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ComicsService } from './comics.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -91,5 +91,16 @@ export class ComicsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @Request() req) {
     return this.comicsService.remove(id, req.user);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.AUTHOR, Role.ADMIN)
+  @Patch(':id')
+  async update(
+    @Param('id') id: string, 
+    @Body() updateComicDto: any, 
+    @Request() req
+  ) {
+    return this.comicsService.update(id, updateComicDto, req.user);
   }
 }
