@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit, Trash2, Loader2 } from "lucide-react";
+import { Edit, Trash2, Loader2, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getComics } from "@/services/api";
 import { getCookie } from "cookies-next";
 import { Comic } from "@/lib/validations/comic";
+import Link from "next/link";
 
 export default function AdminDashboard() {
   const [comics, setComics] = useState<Comic[]>([]);
@@ -37,7 +38,7 @@ export default function AdminDashboard() {
     );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-700">
       <div className="bg-white rounded-3xl border shadow-sm overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-slate-50 border-b">
@@ -54,8 +55,11 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {comics.map((comic: any) => (
-              <tr key={comic.id} className="border-b last:border-0 group">
+            {comics.map((comic) => (
+              <tr
+                key={comic.id}
+                className="border-b last:border-0 hover:bg-slate-50/50 transition-colors group"
+              >
                 <td className="p-4 font-bold text-slate-700 italic uppercase text-sm">
                   {comic.title}
                 </td>
@@ -66,17 +70,28 @@ export default function AdminDashboard() {
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Link href={`/admin/comics/${comic.id}/episodes/new`}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="cursor-pointer h-8 gap-2 text-primary hover:text-primary hover:bg-primary/10 font-black italic uppercase text-[10px]"
+                      >
+                        <PlusCircle size={14} />
+                        Añadir Episodio
+                      </Button>
+                    </Link>
+
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-slate-400 hover:text-primary"
+                      className="cursor-pointer h-8 w-8 text-slate-400 hover:text-slate-900"
                     >
                       <Edit size={16} />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-slate-400 hover:text-red-500"
+                      className="cursor-pointer h-8 w-8 text-slate-400 hover:text-red-500"
                     >
                       <Trash2 size={16} />
                     </Button>
