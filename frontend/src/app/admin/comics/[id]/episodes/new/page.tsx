@@ -62,9 +62,13 @@ export default function NewEpisodePage() {
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <ArrowLeft size={20} />
+          <Link href="/admin" className="cursor-pointer">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer rounded-full"
+            >
+              <ArrowLeft size={20} className="cursor-pointer" />
             </Button>
           </Link>
           <div>
@@ -79,7 +83,7 @@ export default function NewEpisodePage() {
         <Button
           onClick={handleSave}
           disabled={loading}
-          className="px-8 font-black italic uppercase tracking-widest gap-2 h-12 rounded-xl shadow-lg shadow-primary/20"
+          className="cursor-pointer px-8 font-black italic uppercase tracking-widest gap-2 h-12 rounded-xl shadow-lg shadow-primary/20"
         >
           {loading ? <Loader2 className="animate-spin" /> : <Save size={18} />}
           Publicar Capítulo
@@ -87,7 +91,6 @@ export default function NewEpisodePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* INFO DEL EPISODIO */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white p-6 rounded-3xl border shadow-sm space-y-4">
             <div className="space-y-2">
