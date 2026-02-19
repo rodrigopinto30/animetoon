@@ -1,4 +1,3 @@
-// 1. ELIMINAMOS "use client"
 import { getComicById } from "@/services/api";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
@@ -6,8 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Button } from "@/components/ui/button";
-// 2. Importamos un componente que crearemos para la animación
-import { FadeInImage } from "@/components/FadeInImage";
+import { Comic } from "@/lib/validations/comic";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -18,7 +16,7 @@ export default async function ComicDetailPage({ params }: PageProps) {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
-  const comic = await getComicById(id, token).catch(() => null);
+  const comic: Comic = await getComicById(id as string);
 
   if (!comic) {
     notFound();

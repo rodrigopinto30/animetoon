@@ -42,32 +42,41 @@ export const getComics = async (filters: { title?: string, genre?: string, page?
   return response.json();
 };
 
-export const getComicById = async (id: string, token?: string): Promise<ComicDetail> => {
-  const tokenLocal = getCookie("token");
+
+
+export const getComicById = async (id: string) => {
+  // 1. Detectar entorno
+  const isServer = typeof window === 'undefined';
+  
+  let token;
+  if (isServer) {
+    const { cookies } = require('next/headers');
+    const cookieStore = await cookies();
+    token = cookieStore.get("token")?.value;
+  } else {
+    token = getCookie("token");
+  }
+
+  const baseUrl = isServer 
+    ? "http://backend:3001" 
+    : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001");
+
   try {
-    const headers: HeadersInit = {};
-
-    if (tokenLocal) {
-      headers.Authorization = `Bearer ${tokenLocal}`;
-    }
-
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics/${id}`, {
+    const response = await fetch(`${baseUrl}/comics/${id}`, {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        ...(tokenLocal && { 'Authorization': `Bearer ${tokenLocal}` }),
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }),
       },
       cache: 'no-store'
     });
 
-    if (!response.ok) {
-      throw new Error(`API ERROR ${response.status}`);
-    }
+    if (!response.ok) return null;
 
-    return response.json()
-    
+    return await response.json();
   } catch (error) {
-    // console.error("GET COMIC ERROR:", error);
-    throw error;
+    console.error("🚨 Error en getComicById:", error);
+    return null;
   }
 };
 
@@ -136,7 +145,7 @@ export const signup = async (userData: any) => {
   return response.json();
 };
 
-export const toggleFavorite = async (comicId: string, token: string) => {
+export const toggleFavorite = async (comicId: string, token?: string) => {
   const baseUrl = typeof window === 'undefined' ? 'http://backend:3001' : 'http://localhost:3001';
   
   const response = await fetch(`${baseUrl}/favorites/${comicId}`, {
@@ -151,6 +160,15 @@ export const toggleFavorite = async (comicId: string, token: string) => {
     const errorData = await response.json().catch(() => ({}));
     console.error('Error del servidor:', errorData); 
     throw new Error('No se pudo actualizar favoritos');}
+  return response.json();
+};
+
+export const getMyFavorites = async () => {
+  const token = getCookie("token");
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/favorites`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Error al obtener favoritos");
   return response.json();
 };
 
