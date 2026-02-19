@@ -22,97 +22,101 @@ export default async function EpisodeViewerPage({ params }: PageProps) {
   if (!episode || !comic) notFound();
 
   const currentIndex = comic.episodes.findIndex((ep) => ep.id === episodeId);
-
   const nextEpisode = comic.episodes[currentIndex + 1];
   const nextEpisodeId = nextEpisode?.id;
 
   return (
-    <div className="min-h-screen bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-slate-900">
-      <nav className="sticky backdrop-blur-md top-0 z-50 p-4 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-slate-900">
+    <div className="min-h-screen bg-[#f8fafc] bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] text-slate-900">
+      <nav className="sticky top-0 z-50 w-full border-b border-white/20 bg-white/70 backdrop-blur-md px-6 py-4">
         <div className="container mx-auto flex justify-between items-center">
           <Link
             href={`/comics/${id}`}
-            className="text-slate-600 hover:text-primary transition-colors flex items-center gap-2 font-medium"
+            className="group flex items-center gap-2 text-xs font-black uppercase italic tracking-tighter text-slate-500 hover:text-primary transition-all"
           >
-            ← <span className="hidden md:inline">Volver al cómic</span>
+            <span className="group-hover:-translate-x-1 transition-transform">
+              ←
+            </span>{" "}
+            Volver
           </Link>
+
           <div className="text-center">
-            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
-              Leyendo ahora
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">
+              Leyendo {comic.title}
             </p>
-            <h1 className="font-bold truncate max-w-[200px] md:max-w-md text-slate-800">
-              Cap. {episode.number}: {episode.title}
+            <h1 className="max-w-[180px] md:max-w-md truncate font-black uppercase italic tracking-tighter text-slate-800">
+              Cap. {episode.number}:{" "}
+              <span className="text-slate-500">{episode.title}</span>
             </h1>
           </div>
-          <div className="w-10"></div>
+
+          <div className="w-12"></div>
         </div>
       </nav>
 
-      <main className="flex flex-col items-center py-6 gap-4">
+      <div className="flex flex-col items-center py-10 gap-8">
         {episode.pages && episode.pages.length > 0 ? (
           episode.pages.map((page: any, index: number) => (
             <div
               key={page.id}
-              className="relative w-full max-w-3xl bg-white shadow-xl shadow-slate-200/50 ring-1 ring-slate-200"
+              className="group relative w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] transition-transform duration-500 hover:scale-[1.01]"
             >
               <Image
                 src={page.imageUrl}
                 alt={`Página ${index + 1}`}
                 width={800}
                 height={1200}
-                className="w-full h-auto block"
+                className="h-auto w-full block"
                 priority={index < 2}
                 unoptimized
               />
-              <span className="absolute bottom-4 right-4 bg-black/20 backdrop-blur-md text-[10px] text-white px-2 py-1 rounded">
-                {index + 1} / {episode.pages.length}
-              </span>
+              <div className="absolute bottom-4 right-4 translate-y-2 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100">
+                <span className="rounded-full bg-black/50 px-3 py-1 text-[10px] font-bold text-white backdrop-blur-md">
+                  {index + 1} / {episode.pages.length}
+                </span>
+              </div>
             </div>
           ))
         ) : (
-          <div className="py-40 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-              <span className="text-2xl">📖</span>
+          <div className="flex flex-col items-center justify-center py-40 text-center">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-3xl shadow-inner">
+              📖
             </div>
-            <p className="text-slate-500 italic font-medium">
-              Este episodio aún no tiene imágenes cargadas.
+            <p className="font-bold italic uppercase tracking-tighter text-slate-400">
+              Este capítulo está vacío por ahora
             </p>
           </div>
         )}
-      </main>
+      </div>
 
-      <footer className="p-20 bg-white/50 backdrop-blur-sm mt-10 border-t border-slate-200">
-        <div className="flex flex-col items-center gap-8 max-w-2xl mx-auto">
-          <div className="text-center space-y-2">
-            <p className="text-slate-400 text-sm font-bold uppercase tracking-[0.2em]">
-              Fin del Capítulo {episode.number}
-            </p>
-            <h3 className="text-2xl font-black text-slate-800 italic uppercase">
+      <footer className="mt-20 border-t border-slate-200 bg-white/40 px-6 py-24 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-2xl flex-col items-center gap-10">
+          <div className="text-center">
+            <span className="inline-block rounded-full bg-primary/10 px-4 py-1 text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
+              Capítulo Finalizado
+            </span>
+            <h3 className="mt-4 text-4xl font-black italic uppercase tracking-tighter text-slate-800">
               {episode.title}
             </h3>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+          <div className="flex w-full flex-col gap-4 sm:flex-row">
             <Link
               href={`/comics/${id}`}
-              className="px-8 py-4 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-all text-center"
+              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-8 py-4 text-center text-xs font-black uppercase italic tracking-widest text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800"
             >
-              MENÚ DE CAPÍTULOS
+              Lista de Capítulos
             </Link>
 
             {nextEpisodeId ? (
               <Link
                 href={`/comics/${id}/episodes/${nextEpisodeId}`}
-                className="px-10 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-primary transition-all shadow-xl hover:shadow-primary/20 hover:-translate-y-1 active:scale-95 text-center flex items-center justify-center gap-2 group"
+                className="flex-[1.5] rounded-2xl bg-slate-900 px-10 py-4 text-center text-xs font-black uppercase italic tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:-translate-y-1 hover:bg-primary hover:shadow-primary/20 active:scale-95"
               >
-                SIGUIENTE CAPÍTULO
-                <span className="group-hover:translate-x-1 transition-transform">
-                  →
-                </span>
+                Siguiente Capítulo →
               </Link>
             ) : (
-              <div className="px-10 py-4 bg-slate-100 text-slate-400 font-bold rounded-2xl cursor-not-allowed">
-                PRÓXIMAMENTE
+              <div className="flex-1 rounded-2xl bg-slate-100 px-8 py-4 text-center text-xs font-black uppercase italic tracking-widest text-slate-400">
+                Próximamente
               </div>
             )}
           </div>
