@@ -17,6 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
+import { createEpisode } from "@/services/api";
+import { episodeSchema } from "@/lib/validations/episode";
+import { getCookie } from "cookies-next";
 
 export default function NewEpisodePage() {
   const { id: comicId } = useParams();
@@ -45,19 +48,70 @@ export default function NewEpisodePage() {
   };
 
   const handleSave = async () => {
-    if (!title || !number || pages.length === 0) {
-      return toast.error("Faltan datos", {
-        description: "Título, número y al menos una página son obligatorios.",
-      });
-    }
-    setLoading(true);
-    setTimeout(() => {
-      toast.success("¡Episodio publicado!");
-      router.push(`/admin`);
-      setLoading(false);
-    }, 2000);
-  };
+    const filesOnly = pages.map((p) => p.file);
+    const result = episodeSchema.safeParse({
+      number,
+      title,
+      pages: filesOnly,
+    });
 
+    if (!result.success) {
+      result.error.issues.forEach((issue: any) => {
+        toast.error("Error de validación", { description: issue.message });
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const token = getCookie("token") as string;
+
+      const episodeResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/comics/${comicId}/episodes`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: title.trim(),
+            number: Number(number),
+          }),
+        },
+      );
+
+      if (!episodeResponse.ok)
+        throw new Error("Error al crear la base del episodio");
+      const newEpisode = await episodeResponse.json();
+
+      const pagesFormData = new FormData();
+      pages.forEach((page) => {
+        pagesFormData.append("pages", page.file);
+      });
+
+      const uploadResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/comics/episodes/${newEpisode.id}/pages`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: pagesFormData,
+        },
+      );
+
+      if (!uploadResponse.ok) throw new Error("Error al subir las imágenes");
+
+      toast.success("¡Capítulo y páginas publicados!");
+      router.push("/admin");
+    } catch (error: any) {
+      toast.error("Error en el proceso", { description: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
