@@ -35,6 +35,7 @@ export class ComicsController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.AUTHOR)
   @Post(':id/episodes')
+  @UseInterceptors(FilesInterceptor('files'))
   async addEpisode(@Param('id') comicId: string, @Body() episodeData: any) {
     return this.comicsService.createEpisode(comicId, episodeData);
   }

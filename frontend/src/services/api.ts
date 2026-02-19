@@ -164,7 +164,6 @@ export const getUserFavorites = async (token: string) => {
   return response.json();
 };
 
-
 export async function createComic(comicData: any, token: string | undefined) {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics`, {
     method: "POST",
@@ -178,6 +177,23 @@ export async function createComic(comicData: any, token: string | undefined) {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "Error al crear el cómic");
+  }
+
+  return response.json();
+}
+
+export async function createEpisode(comicId: string, formData: FormData, token: string) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics/${comicId}/episodes`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Error al subir el episodio");
   }
 
   return response.json();
