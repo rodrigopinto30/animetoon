@@ -15,6 +15,7 @@ export interface Comic {
   status?: 'ONGOING' | 'COMPLETED';
   genre?: string;
   isFavorite?: boolean;
+  episodes: [];
 }
 
 export interface EpisodePage {

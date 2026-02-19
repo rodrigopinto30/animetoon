@@ -3,54 +3,59 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Heart, Trash2, BookOpen, Search } from "lucide-react";
+import { Heart, Trash2, BookOpen, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-const INITIAL_FAVORITES = [
-  {
-    id: 1,
-    title: "Solo Leveling",
-    chapter: "Cap. 179",
-    image:
-      "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=400",
-  },
-  {
-    id: 2,
-    title: "One Piece",
-    chapter: "Cap. 1105",
-    image:
-      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?q=80&w=400",
-  },
-  {
-    id: 3,
-    title: "Jujutsu Kaisen",
-    chapter: "Cap. 248",
-    image:
-      "https://images.unsplash.com/photo-1614583225154-5feaba070215?q=80&w=400",
-  },
-];
+import { getMyFavorites, toggleFavorite } from "@/services/api";
+import Image from "next/image";
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState(INITIAL_FAVORITES);
-  const [mounted, setMounted] = useState(false);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    async function loadFavorites() {
+      try {
+        const data = await getMyFavorites();
+        const flatComics = data.map((fav: any) => ({
+          ...fav.comic,
+          favoriteId: fav.id,
+        }));
 
-  const removeFavorite = (id: number, title: string) => {
-    setFavorites((prev) => prev.filter((fav) => fav.id !== id));
-    toast.error("Eliminado", {
-      description: `${title} ha sido quitado de tus favoritos.`,
-    });
+        setFavorites(flatComics);
+      } catch (error) {
+        toast.error("Error al cargar biblioteca");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFavorites();
+  }, []);
+
+  const removeFavorite = async (id: string, title: string) => {
+    try {
+      await toggleFavorite(id);
+      setFavorites((prev) => prev.filter((fav) => fav.id !== id));
+      toast.success("Eliminado", {
+        description: `${title} ha sido quitado de tu biblioteca.`,
+      });
+    } catch (error) {
+      toast.error("No se pudo eliminar");
+    }
   };
 
-  if (!mounted) return null;
+  if (loading)
+    return (
+      <div className="flex h-[70vh] items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={40} />
+      </div>
+    );
 
   return (
     <div className="container mx-auto py-10 px-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
         <div>
-          <h1 className="text-5xl font-black italic tracking-tighter uppercase italic flex items-center gap-3">
+          <h1 className="text-5xl font-black italic tracking-tighter uppercase flex items-center gap-3">
             <Heart className="h-10 w-10 text-red-500 fill-red-500" /> Mi
             Biblioteca
           </h1>
@@ -66,9 +71,9 @@ export default function FavoritesPage() {
             layout
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
           >
-            {favorites.map((manga) => (
+            {favorites.map((comic, key: number) => (
               <motion.div
-                key={manga.id}
+                key={key}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -76,9 +81,13 @@ export default function FavoritesPage() {
                 className="group relative bg-background/40 backdrop-blur-md border rounded-2xl overflow-hidden shadow-xl hover:border-primary/50 transition-all"
               >
                 <div className="aspect-[3/4] overflow-hidden relative">
-                  <img
-                    src={manga.image}
-                    alt={manga.title}
+                  <Image
+                    src={
+                      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?q=80&w=400"
+                    }
+                    alt={"comic.title as string"}
+                    width={20}
+                    height={50}
                     className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
@@ -86,7 +95,7 @@ export default function FavoritesPage() {
                       variant="destructive"
                       size="icon"
                       className="ml-auto"
-                      onClick={() => removeFavorite(manga.id, manga.title)}
+                      onClick={() => removeFavorite(comic.id, comic.title)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -95,13 +104,13 @@ export default function FavoritesPage() {
 
                 <div className="p-4">
                   <h3 className="font-bold text-sm truncate uppercase tracking-tight italic">
-                    {manga.title}
+                    {comic.title}
                   </h3>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">
-                      {manga.chapter}
+                      {comic.genre || "MANGA"}
                     </span>
-                    <Link href={`/manga/${manga.id}`}>
+                    <Link href={`/comics/${comic.id}`}>
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
                         <BookOpen className="h-4 w-4" />
                       </Button>
