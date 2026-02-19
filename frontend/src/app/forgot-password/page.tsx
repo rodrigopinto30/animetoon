@@ -32,7 +32,6 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (values: ForgotValues) => {
     try {
       // await requestPasswordReset(values.email);
-      console.log("Solicitando reset para:", values.email);
 
       setIsSent(true);
       toast.success("Correo enviado", {

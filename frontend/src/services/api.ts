@@ -1,6 +1,7 @@
 import { LoginValues } from "@/lib/validations/auth";
 import { ComicDetail, EpisodeDetail } from "@/lib/validations/comic";
 import Cookies from 'js-cookie';
+import { getCookie } from "cookies-next";
 
 export interface Comic {
   id: string;
@@ -69,18 +70,22 @@ export const getComicById = async (id: string, token?: string): Promise<ComicDet
   }
 };
 
-export const getEpisodeById = async (episodeId: string, token?: string): Promise<EpisodeDetail> => {
-  const isServer = typeof window === 'undefined';
-  const baseUrl = isServer ? 'http://backend:3001' : 'http://backend:3001';
+export const getEpisodeById = async (episodeId: string) => {
+  const token = getCookie("token");
 
-  const response = await fetch(`${baseUrl}/comics/episodes/${episodeId}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics/episodes/${episodeId}`, {
+    method: "GET",
     headers: {
-      ...(token && { 'Authorization': `Bearer ${token}` }),
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
     },
-    cache: 'no-store',
   });
 
-  if (!response.ok) throw new Error('No se pudo cargar el episodio');
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error al obtener el episodio");
+  }
+
   return response.json();
 };
 
