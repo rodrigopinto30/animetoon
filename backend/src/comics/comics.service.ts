@@ -112,18 +112,24 @@ export class ComicsService {
   }
 
   async update(id: string, updateComicDto: any, user: any) {
+    const existingComic = await this.comicRepository.findOne({ 
+      where: { id }, 
+      relations: ['author'] 
+    });
+
+    if (!existingComic) {
+      throw new NotFoundException('El cómic que intentas editar no existe');
+    }
+
+    if (existingComic.author.id !== user.userId && user.role !== Role.ADMIN) {
+      throw new ForbiddenException('No tienes permiso para editar este cómic');
+    }
+
     const comic = await this.comicRepository.preload({
       id: id,
       ...updateComicDto,
     });
 
-    if (!comic) throw new NotFoundException('Cómic no encontrado');
-
-    const existingComic = await this.comicRepository.findOne({ where: { id }, relations: ['author'] });
-    if (existingComic.author.id !== user.userId && user.role !== Role.ADMIN) {
-      throw new ForbiddenException('No tienes permiso para editar este cómic');
-    }
-
-    return this.comicRepository.save(comic);
+    return this.comicRepository.save(comic!);
   }
 }
