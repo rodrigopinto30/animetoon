@@ -3,14 +3,37 @@
 import { useEffect, useState } from "react";
 import { Edit, Trash2, Loader2, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getComics } from "@/services/api";
+import { getComics, deleteComic } from "@/services/api";
 import { getCookie } from "cookies-next";
 import { Comic } from "@/lib/validations/comic";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const [comics, setComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleDelete = async (id: string, title: string) => {
+    const confirmed = window.confirm(
+      `¿Estás seguro de que quieres eliminar "${title}"? Esta acción no se puede deshacer.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteComic(id);
+
+      setComics((prev) => prev.filter((comic) => comic.id !== id));
+
+      toast.success("Cómic eliminado", {
+        description: `"${title}" ha sido borrado correctamente.`,
+      });
+    } catch (error: any) {
+      toast.error("Error al eliminar", {
+        description: error.message,
+      });
+    }
+  };
 
   useEffect(() => {
     async function fetchComics() {
@@ -91,7 +114,8 @@ export default function AdminDashboard() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="cursor-pointer h-8 w-8 text-slate-400 hover:text-red-500"
+                      onClick={() => handleDelete(comic.id, comic.title)}
+                      className="cursor-pointer h-8 w-8 text-slate-400 hover:text-red-500 transition-colors"
                     >
                       <Trash2 size={16} />
                     </Button>

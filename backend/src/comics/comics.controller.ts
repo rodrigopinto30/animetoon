@@ -1,5 +1,5 @@
 
-import { Get, Controller,Req, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
+import { Get, Controller,Req, Post, Body, Delete, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ComicsService } from './comics.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -84,5 +84,12 @@ export class ComicsController {
     @Query('limit') limit: number = 10
   ) {
     return this.comicsService.findAll(title, genre, Number(page), Number(limit));
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.AUTHOR, Role.ADMIN)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Request() req) {
+    return this.comicsService.remove(id, req.user);
   }
 }

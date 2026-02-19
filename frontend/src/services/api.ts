@@ -203,3 +203,21 @@ export async function createEpisode(comicId: string, formData: FormData, token: 
 
   return response.json();
 }
+
+export const deleteComic = async (id: string) => {
+  const token = getCookie("token");
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "No se pudo eliminar el cómic");
+  }
+
+  return response.json();
+};
