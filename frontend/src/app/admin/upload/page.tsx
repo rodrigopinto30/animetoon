@@ -8,8 +8,6 @@ import {
   Italic,
   List,
   Heading1,
-  Heading2,
-  ImageIcon,
   Save,
   Loader2,
   UploadCloud,
@@ -18,13 +16,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { createComic } from "@/services/api";
+import { getCookie } from "cookies-next";
 
 const MenuBar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
-
   return (
     <div className="flex flex-wrap gap-1 p-2 border-b bg-slate-50">
       <Button
+        type="button"
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -35,6 +36,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Heading1 size={16} />
       </Button>
       <Button
+        type="button"
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -43,6 +45,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Bold size={16} />
       </Button>
       <Button
+        type="button"
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -51,6 +54,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
         <Italic size={16} />
       </Button>
       <Button
+        type="button"
         variant="ghost"
         size="sm"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -64,6 +68,11 @@ const MenuBar = ({ editor }: { editor: any }) => {
 
 export default function UploadComicPage() {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const [title, setTitle] = useState("");
+  const [genre, setGenre] = useState("");
+  const [coverImage, setCoverImage] = useState("https://picsum.photos/400/600");
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -77,18 +86,45 @@ export default function UploadComicPage() {
   });
 
   const handleSave = async () => {
-    setLoading(true);
     const htmlContent = editor?.getHTML();
 
-    setTimeout(() => {
-      console.log("Contenido a guardar:", htmlContent);
-      toast.success("¡Cómic creado con éxito!");
+    if (!title || !htmlContent || htmlContent === "<p></p>") {
+      return toast.error("Faltan campos", {
+        description: "El título y la descripción son obligatorios.",
+      });
+    }
+
+    setLoading(true);
+
+    try {
+      const token = getCookie("token") as string;
+
+      const payload = {
+        title,
+        genre: genre || "General",
+        description: htmlContent,
+        coverImage,
+      };
+
+      await createComic(payload, token);
+
+      toast.success("¡Cómic publicado!", {
+        description: "Se ha añadido correctamente al catálogo.",
+      });
+
+      router.push("/admin");
+      router.refresh();
+    } catch (error: any) {
+      toast.error("Error al crear", {
+        description: error.message || "No se pudo conectar con el servidor.",
+      });
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white p-8 rounded-3xl border shadow-sm space-y-4">
           <h3 className="font-black italic uppercase tracking-tighter text-slate-800">
@@ -109,8 +145,10 @@ export default function UploadComicPage() {
               Título del Cómic
             </Label>
             <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Ej: Solo Leveling"
-              className="rounded-xl border-slate-200"
+              className="rounded-xl border-slate-200 focus:ring-primary"
             />
           </div>
 
@@ -119,15 +157,17 @@ export default function UploadComicPage() {
               Género
             </Label>
             <Input
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
               placeholder="Acción, Aventura..."
-              className="rounded-xl border-slate-200"
+              className="rounded-xl border-slate-200 focus:ring-primary"
             />
           </div>
         </div>
       </div>
 
-      <div className="lg:col-span-2 space-y-6">
-        <div className="bg-white rounded-3xl border shadow-sm overflow-hidden flex flex-col h-full">
+      <div className="lg:col-span-2 space-y-6 flex flex-col h-full">
+        <div className="bg-white rounded-3xl border shadow-sm overflow-hidden flex flex-col flex-1">
           <div className="p-6 border-b">
             <h3 className="font-black italic uppercase tracking-tighter text-slate-800">
               Descripción Enriquecida
@@ -139,22 +179,28 @@ export default function UploadComicPage() {
 
           <MenuBar editor={editor} />
 
-          <div className="flex-1 overflow-y-auto">
-            <EditorContent editor={editor} />
+          <div className="flex-1 overflow-y-auto min-h-[400px]">
+            {editor ? (
+              <EditorContent editor={editor} />
+            ) : (
+              <div className="p-10 text-slate-300 animate-pulse">
+                Iniciando editor...
+              </div>
+            )}
           </div>
 
           <div className="p-6 border-t bg-slate-50 flex justify-end">
             <Button
               disabled={loading}
               onClick={handleSave}
-              className="px-8 font-black italic uppercase tracking-widest gap-2 h-12 rounded-xl"
+              className="px-10 font-black italic uppercase tracking-widest gap-2 h-14 rounded-2xl shadow-lg shadow-slate-200 hover:shadow-primary/20 transition-all"
             >
               {loading ? (
                 <Loader2 className="animate-spin" />
               ) : (
                 <Save size={18} />
               )}
-              Publicar Cómic
+              {loading ? "PUBLICANDO..." : "PUBLICAR CÓMIC"}
             </Button>
           </div>
         </div>

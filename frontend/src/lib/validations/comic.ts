@@ -13,7 +13,7 @@ export interface Comic {
   coverImage: string;
   author?: string;
   status?: 'ONGOING' | 'COMPLETED';
-  genre?: string[];
+  genre?: string;
   isFavorite?: boolean;
 }
 

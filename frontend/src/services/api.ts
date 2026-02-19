@@ -163,3 +163,22 @@ export const getUserFavorites = async (token: string) => {
   if (!response.ok) return [];
   return response.json();
 };
+
+
+export async function createComic(comicData: any, token: string | undefined) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(comicData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error al crear el cómic");
+  }
+
+  return response.json();
+}
