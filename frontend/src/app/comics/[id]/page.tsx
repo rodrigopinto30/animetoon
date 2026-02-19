@@ -62,9 +62,12 @@ export default async function ComicDetailPage({ params }: PageProps) {
             <h3 className="text-sm font-black uppercase tracking-widest text-primary italic">
               Sinopsis
             </h3>
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              {comic.description}
-            </p>
+            <div
+              className="prose prose-slate dark:prose-invert max-w-none 
+               prose-headings:font-black prose-headings:uppercase prose-headings:italic prose-headings:tracking-tighter
+               prose-p:text-muted-foreground prose-p:text-lg"
+              dangerouslySetInnerHTML={{ __html: comic.description }}
+            />
           </div>
         </div>
       </section>
