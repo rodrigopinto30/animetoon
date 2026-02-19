@@ -104,13 +104,15 @@ export default function AdminDashboard() {
                       </Button>
                     </Link>
 
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="cursor-pointer h-8 w-8 text-slate-400 hover:text-slate-900"
-                    >
-                      <Edit size={16} />
-                    </Button>
+                    <Link href={`/admin/comics/${comic.id}/edit`}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="cursor-pointer h-8 w-8 text-slate-400 hover:text-slate-900"
+                      >
+                        <Edit size={16} />
+                      </Button>
+                    </Link>
                     <Button
                       variant="ghost"
                       size="icon"

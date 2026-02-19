@@ -43,17 +43,18 @@ export const getComics = async (filters: { title?: string, genre?: string, page?
 };
 
 export const getComicById = async (id: string, token?: string): Promise<ComicDetail> => {
+  const tokenLocal = getCookie("token");
   try {
     const headers: HeadersInit = {};
 
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
+    if (tokenLocal) {
+      headers.Authorization = `Bearer ${tokenLocal}`;
     }
 
-    const response = await fetch(`http://backend:3001/comics/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics/${id}`, {
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...(tokenLocal && { 'Authorization': `Bearer ${tokenLocal}` }),
       },
       cache: 'no-store'
     });
@@ -217,6 +218,26 @@ export const deleteComic = async (id: string) => {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || "No se pudo eliminar el cómic");
+  }
+
+  return response.json();
+};
+
+export const updateComic = async (id: string, data: any) => {
+  const token = getCookie("token");
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comics/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error al actualizar el cómic");
   }
 
   return response.json();
