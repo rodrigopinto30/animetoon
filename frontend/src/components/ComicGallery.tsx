@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { motion } from "framer-motion";
 import { getComics, Comic } from "@/services/api";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
@@ -45,6 +46,7 @@ export default function ComicGallery() {
             <SelectItem value="all">Todos los géneros</SelectItem>
             <SelectItem value="Accion">Acción</SelectItem>
             <SelectItem value="Ciencia Ficcion">Ciencia Ficción</SelectItem>
+            <SelectItem value="Fantasia">Fantasia</SelectItem>
             <SelectItem value="Terror">Terror</SelectItem>
           </SelectContent>
         </Select>
@@ -54,44 +56,35 @@ export default function ComicGallery() {
         {" "}
         {comics.map((comic) => (
           <Link href={`/comics/${comic.id}`} key={comic.id}>
-            <Card
-              key={comic.id}
-              className="group overflow-hidden border-none bg-secondary/10 hover:bg-secondary/20 transition-all duration-300 cursor-pointer"
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="group relative bg-background/40 backdrop-blur-md border rounded-2xl overflow-hidden shadow-xl hover:border-primary/50 transition-all duration-300"
             >
-              <div className="relative aspect-[2/3] overflow-hidden">
-                <div className="absolute top-2 left-2 z-10">
-                  <Badge
-                    variant="secondary"
-                    className="bg-black/60 text-white backdrop-blur-md border-none"
-                  >
-                    {comic.genre}
-                  </Badge>
-                </div>
-
+              <div className="aspect-[2/3] overflow-hidden relative">
                 <img
                   src={comic.coverImage}
                   alt={comic.title}
                   className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                 />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                  <p className="text-xs text-gray-200 line-clamp-2">
-                    {comic.description || "Haz clic para ver más detalles..."}
-                  </p>
+                <div className="absolute top-2 left-2">
+                  <Badge className="bg-primary/90 text-primary-foreground font-black italic uppercase text-[10px]">
+                    {comic.genre}
+                  </Badge>
                 </div>
               </div>
 
-              <CardHeader className="p-3">
-                <CardTitle className="text-md font-bold leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+              <div className="p-3 space-y-1">
+                <h3 className="font-bold text-sm truncate uppercase italic tracking-tight group-hover:text-primary transition-colors">
                   {comic.title}
-                </CardTitle>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-                    Capítulos: 12
+                </h3>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground font-bold">
+                    12 CAPÍTULOS
                   </span>
+                  <div className="h-1 w-1 rounded-full bg-primary animate-pulse" />
                 </div>
-              </CardHeader>
-            </Card>
+              </div>
+            </motion.div>
           </Link>
         ))}
       </div>
