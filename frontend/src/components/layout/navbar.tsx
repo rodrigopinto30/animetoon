@@ -19,7 +19,6 @@ export function Navbar() {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
-    console.log(savedUser);
   }, []);
 
   const token = mounted ? Cookies.get("token") : null;
