@@ -30,7 +30,7 @@ export default async function ComicDetailPage({ params }: PageProps) {
       <section className="flex flex-col md:flex-row gap-12 items-start">
         <div className="w-full md:w-80 shrink-0">
           <Image
-            src={comic.coverImage || imageSrc}
+            src={comic.coverImage}
             alt={comic.title}
             width={320}
             height={426}

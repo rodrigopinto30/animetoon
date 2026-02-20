@@ -58,13 +58,38 @@ export class ComicsService {
       isFavorite
     };
   }
+  
   async findEpisodeById(id: string) {
-    return await this.episodeRepository.findOne({
+    const episode = await this.episodeRepository.findOne({
       where: { id },
-      relations: ['comments', 'comments.user'], 
+      relations: ['comic', 'comments', 'comments.user', 'pages'], 
     });
-  }
 
+    if (!episode) throw new NotFoundException('Episodio no encontrado');
+
+    const prevEpisode = await this.episodeRepository.findOne({
+      where: { 
+        comic: { id: episode.comic.id }, 
+        number: episode.number - 1 
+      },
+      select: ['id']
+    });
+
+    const nextEpisode = await this.episodeRepository.findOne({
+      where: { 
+        comic: { id: episode.comic.id }, 
+        number: episode.number + 1 
+      },
+      select: ['id']
+    });
+
+    return {
+      ...episode,
+      prevEpisodeId: prevEpisode?.id || null,
+      nextEpisodeId: nextEpisode?.id || null,
+    };
+  }
+  
   async findAll(title?: string, genre?: string, page: number = 1, limit: number = 10) {
     const query = this.comicRepository.createQueryBuilder('comic')
       .leftJoinAndSelect('comic.author', 'author'); 
@@ -131,5 +156,15 @@ export class ComicsService {
     });
 
     return this.comicRepository.save(comic!);
+  }
+
+  async getEpisode(id: string) {
+    return await this.episodeRepository.findOne({
+      where: { id },
+      relations: ['pages'],
+      order: {
+        pages: { order: 'ASC' } 
+      }
+    });
   }
 }

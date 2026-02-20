@@ -1,6 +1,7 @@
 import { OneToMany, Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
 import { Comic } from './comic.entity';
 import { Comment } from '../../comments/entities/comment.entity'; 
+import { Page } from './page.entity';
 
 @Entity('episodes')
 export class Episode {
@@ -11,18 +12,24 @@ export class Episode {
   title: string;
 
   @Column({ type: 'int' })
-  number: number; 
+  number: number;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
   @Column({ default: false })
   isFree: boolean;
 
   @Column({ type: 'int', default: 0 })
-  price: number; 
+  price: number;
 
-  @ManyToOne(() => Comic, (comic) => comic.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Comic, (comic: Comic) => comic.id, { onDelete: 'CASCADE' })
   comic: Comic;
 
-  @OneToMany(() => Comment, (comment) => comment.episode)
+  @OneToMany(() => Page, (page: Page) => page.episode, { cascade: true })
+  pages: Page[];
+
+  @OneToMany(() => Comment, (comment: Comment) => comment.episode)
   comments: Comment[];
 
   @CreateDateColumn()
