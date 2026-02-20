@@ -1,8 +1,8 @@
 # 📚 ANIMETOON – Full-Stack Comic Platform
 
 ![Versión](https://img.shields.io/badge/version-1.1.0-blue.svg)
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
-![NestJS](https://img.shields.io/badge/NestJS-10-red)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![NestJS](https://img.shields.io/badge/NestJS-red)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 
 ANIMETOON es una plataforma full-stack moderna para la publicación y lectura de cómics digitales.  
