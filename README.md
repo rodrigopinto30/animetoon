@@ -1,64 +1,193 @@
-# 📚 ANIMETOON - Full-Stack Comic Platform
+# 📚 ANIMETOON – Full-Stack Comic Platform
 
-![Versión](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Versión](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![NestJS](https://img.shields.io/badge/NestJS-10-red)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 
-**ANIMETOON** es una plataforma integral para la publicación y lectura de cómics digitales. Diseñada con un enfoque en la experiencia de usuario (UX) y la escalabilidad, permite a los autores gestionar sus obras y a los lectores sumergirse en historias mediante un lector vertical optimizado.
-
----
-
-## 📝 Secciones del Proyecto
-
-### 1. 🚀 Características Principales
-* **Gestión de Contenido (CRUD):** Sistema completo para crear, leer, actualizar y eliminar cómics y episodios.
-* **Biblioteca Personal:** Los usuarios pueden marcar cómics como favoritos con persistencia en base de datos y animaciones fluidas.
-* **Lector Premium:** Visualizador de episodios con scroll vertical, optimizado para una lectura sin interrupciones.
-* **Panel Administrativo:** Dashboard robusto para el control de publicaciones y métricas básicas.
-* **Autenticación Segura:** Flujo completo de registro e inicio de sesión basado en roles.
-
-### 2. 🛠️ Stack Tecnológico
-#### **Frontend (El Cliente)**
-* **Next.js:** Uso de *App Router* y componentes híbridos (SSR y Client Components).
-* **Tailwind CSS:** Diseño responsivo y estilizado basado en utilidades.
-* **Framer Motion:** Micro-interacciones y transiciones suaves entre páginas.
-* **Shadcn/UI:** Componentes de interfaz accesibles y consistentes.
-* **Lucide React:** Set de iconos minimalistas y modernos.
-
-#### **Backend (La API)**
-* **NestJS:** Arquitectura modular y escalable para el lado del servidor.
-* **TypeORM:** Gestión de base de datos relacional con MySQL.
-* **JWT & Passport:** Estrategia de seguridad para la protección de endpoints.
-* **Multer:** Procesamiento eficiente de archivos multimedia (portadas y páginas).
+ANIMETOON es una plataforma full-stack moderna para la publicación y lectura de cómics digitales.  
+Construida con una arquitectura escalable utilizando **Next.js 16 (App Router)** en el frontend y **NestJS** en el backend, incluye autenticación JWT, control de acceso por roles (RBAC), lector vertical optimizado y entorno completamente dockerizado.
 
 ---
 
-## 🛡️ Buenas Prácticas y Calidad de Código
+# 🎯 Objetivos del Proyecto
 
-### **Arquitectura Isomórfica**
-Se implementó un servicio de conexión a API inteligente que detecta el entorno de ejecución. Esto permite que el servidor de Next.js (Node) se comunique internamente mediante la red de Docker (`http://backend`), mientras que el navegador utiliza la red externa (`localhost`), evitando errores de resolución de nombres.
-
-### **Seguridad de Nivel Producción**
-* **RBAC (Role-Based Access Control):** Control de acceso basado en roles (Admin, Author, Reader) para proteger el contenido.
-* **Data Validation:** Validación estricta de datos mediante DTOs en el backend y esquemas en el frontend.
-* **Null-Safety:** Manejo preventivo de errores de punteros nulos para evitar caídas del servidor durante consultas a la DB.
-
-### **Metodología de Desarrollo**
-* **Atomic Pushes:** Siguiendo la filosofía de cambios frecuentes y pequeños para facilitar el mantenimiento y evitar regresiones.
-* **Separación de Preocupaciones (SoC):** Lógica de negocio encapsulada en servicios, dejando los controladores y componentes limpios.
+- ⚡ Experiencia de usuario fluida con animaciones modernas.
+- 🔐 Seguridad robusta con autenticación JWT + RBAC.
+- 🧱 Arquitectura limpia, modular y escalable.
+- 🐳 Despliegue simple mediante Docker.
+- 🌱 Generación automática de datos de prueba.
 
 ---
 
-## 📂 Estructura de Archivos
-```text
+# 🚀 Quick Start
+
+## 1️⃣ Requisitos
+
+- Docker
+- Docker Compose
+- Archivo `.env` dentro de la carpeta `backend/` con:
+
+```env
+JWT_SECRET=your_secret_key
+```
+
+---
+
+## 2️⃣ Levantar el sistema
+
+Desde la raíz del proyecto ejecutar:
+
+```bash
+docker-compose up --build
+```
+
+Esto iniciará:
+
+- 🗄️ MySQL
+- 🔧 API NestJS → http://localhost:3001
+- 🌐 Cliente Next.js → http://localhost:3000
+
+---
+
+## 3️⃣ Poblar la Base de Datos (Seeding)
+
+Para generar usuarios, cómics, episodios y páginas automáticamente:
+
+```bash
+docker-compose exec backend npm run seed
+```
+
+### Credenciales generadas por defecto
+
+| Rol   | Email              | Password  |
+|--------|-------------------|-----------|
+| Admin  | admin@gmail.com   | admin123  |
+| User   | user@gmail.com    | user123   |
+
+---
+
+# 🛠️ Stack Tecnológico
+
+## 🎨 Frontend (Next.js 16)
+
+- App Router
+- Server Components
+- Middleware para protección de rutas
+- Tailwind CSS
+- Shadcn/UI
+- Framer Motion
+- Jose (validación JWT en Edge Runtime)
+
+## 🔧 Backend (NestJS)
+
+- Arquitectura modular (Controllers, Services, Modules)
+- TypeORM
+- MySQL
+- Autenticación JWT
+- Bcrypt (hash seguro de contraseñas)
+- Faker.js (generación masiva de datos)
+
+---
+
+# 🏗️ Modelo de Datos
+
+Entidades principales del sistema:
+
+- **User** → Gestión de perfiles y roles (admin, author, reader)
+- **Comic** → Obra principal con metadatos y portada
+- **Episode** → Capítulos numerados asociados a un cómic
+- **Page** → Imágenes individuales ordenadas secuencialmente
+- **Favorite** → Relación Many-to-Many para la biblioteca personal
+
+---
+
+# 🔐 Seguridad
+
+## RBAC (Role-Based Access Control)
+
+El middleware de Next.js:
+
+- Intercepta peticiones
+- Valida el JWT
+- Verifica el rol del usuario
+- Restringe acceso a rutas protegidas
+
+Rutas protegidas:
+
+- `/favorites`
+- `/reader/[id]`
+- `/admin/*`
+
+---
+
+# 🌐 Arquitectura API Isomórfica
+
+El servicio de conexión detecta automáticamente:
+
+- Si la petición proviene del servidor (SSR dentro de Docker)
+- Si proviene del cliente (browser)
+
+Resolviendo correctamente conflictos de red interna y DNS entre contenedores.
+
+---
+
+# 📂 Estructura del Proyecto
+
+```
 .
-├── backend/                # API en NestJS
-│   ├── src/auth/           # Seguridad y Roles
-│   ├── src/comics/         # Lógica de Cómics y Episodios
-│   └── src/favorites/      # Gestión de Biblioteca
-├── frontend/               # Cliente en Next.js
-│   ├── src/app/            # Sistema de Rutas
-│   ├── src/components/     # UI Reutilizable
-│   └── src/services/       # Comunicación con API
-└── docker-compose.yml      # Orquestación de Contenedores
+├── backend/                 # API NestJS (Puerto 3001)
+│   ├── src/auth/
+│   ├── src/comics/
+│   ├── src/db/seeds/
+│   └── src/favorites/
+│
+├── frontend/                # Cliente Next.js (Puerto 3000)
+│   ├── src/app/
+│   ├── src/components/
+│   ├── src/services/
+│   └── middleware.ts
+│
+└── docker-compose.yml       # Orquestación de contenedores
+```
+
+---
+
+# 🗺️ Mapa de Rutas
+
+| Ruta | Acceso | Descripción |
+|------|--------|-------------|
+| `/` | Público | Galería principal de cómics |
+| `/comics/[id]` | Público | Detalle del cómic |
+| `/login` | Público | Autenticación |
+| `/favorites` | Registrado | Biblioteca personal |
+| `/reader/[id]` | Registrado | Lector vertical optimizado |
+| `/admin/*` | Admin | Panel de administración |
+
+---
+
+# 🧪 Metodología de Desarrollo
+
+## Atomic Pushes
+
+- Commits pequeños y enfocados
+- Cada cambio cumple una sola responsabilidad
+- Facilita code review
+- Reduce regresiones
+- Mejora trazabilidad
+
+---
+
+# 📦 Consideraciones para Producción
+
+- Configurar variables de entorno seguras
+- Utilizar base de datos persistente
+- Implementar reverse proxy (ej: NGINX)
+- Habilitar HTTPS
+- Configurar backups automáticos
+
+---
+
+# 📄 Licencia
+
+Proyecto desarrollado con fines educativos y demostrativos.
