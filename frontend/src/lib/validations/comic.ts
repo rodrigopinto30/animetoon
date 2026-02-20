@@ -1,11 +1,22 @@
+export interface Page {
+  id: string;
+  imageUrl: string;
+  order: number;
+}
+
 export interface Episode {
   id: string;
   number: number;
   title: string;
-  releaseDate: string;
-  thumbnailUrl?: string;
+  description: string | null;
+  isFree: boolean;
+  price: number;
+  pages: Page[];
+  createdAt: string;
+  thumbnailUrl?: string;   
+  prevEpisodeId: string | null;
+  nextEpisodeId: string | null;
 }
-
 export interface Comic {
   id: string;
   title: string;
@@ -16,6 +27,12 @@ export interface Comic {
   genre?: string;
   isFavorite?: boolean;
   episodes: [];
+}
+export interface PaginatedComics {
+  items: Comic[];
+  total: number;
+  page: number;
+  lastPage: number;
 }
 
 export interface EpisodePage {
@@ -32,6 +49,6 @@ export interface EpisodeDetail {
   nextEpisodeId?: string | null;
   prevEpisodeId?: string | null;
 }
-export interface ComicDetail extends Comic { 
-  episodes: Episode[];
-}
+// export interface ComicDetail extends Comic { 
+//   episodes: Episode[];
+// }
