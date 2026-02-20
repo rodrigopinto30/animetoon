@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { getMyFavorites, toggleFavorite } from "@/services/api";
 import Image from "next/image";
+import { Comic } from "@/lib/validations/comic";
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<any[]>([]);
@@ -17,12 +18,8 @@ export default function FavoritesPage() {
     async function loadFavorites() {
       try {
         const data = await getMyFavorites();
-        const flatComics = data.map((fav: any) => ({
-          ...fav.comic,
-          favoriteId: fav.id,
-        }));
-
-        setFavorites(flatComics);
+        console.log(data);
+        setFavorites(data);
       } catch (error) {
         toast.error("Error al cargar biblioteca");
       } finally {
@@ -71,7 +68,7 @@ export default function FavoritesPage() {
             layout
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
           >
-            {favorites.map((comic, key: number) => (
+            {favorites.map((comic: Comic, key: number) => (
               <motion.div
                 key={key}
                 layout
@@ -82,10 +79,8 @@ export default function FavoritesPage() {
               >
                 <div className="aspect-[3/4] overflow-hidden relative">
                   <Image
-                    src={
-                      "https://images.unsplash.com/photo-1580477667995-2b94f01c9516?q=80&w=400"
-                    }
-                    alt={"comic.title as string"}
+                    src={comic.coverImage}
+                    alt={comic.title}
                     width={20}
                     height={50}
                     className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
@@ -94,7 +89,7 @@ export default function FavoritesPage() {
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="ml-auto"
+                      className="ml-auto cursor-pointer"
                       onClick={() => removeFavorite(comic.id, comic.title)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -111,7 +106,11 @@ export default function FavoritesPage() {
                       {comic.genre || "MANGA"}
                     </span>
                     <Link href={`/comics/${comic.id}`}>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 cursor-pointer"
+                      >
                         <BookOpen className="h-4 w-4" />
                       </Button>
                     </Link>
