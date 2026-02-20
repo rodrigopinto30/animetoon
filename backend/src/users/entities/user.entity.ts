@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
 import { Role } from '../../auth/enums/roles.enum';
-import { Favorite } from 'src/favorites/entities/favorite.entity';
+import { Favorite } from '../../favorites/entities/favorite.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
 
 @Entity('users')
