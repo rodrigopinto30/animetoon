@@ -29,14 +29,17 @@ export default function FavoritesPage() {
     loadFavorites();
   }, []);
 
-  const removeFavorite = async (id: string, title: string) => {
+  const removeFavorite = async (comicId: string, title: string) => {
     try {
-      await toggleFavorite(id);
-      setFavorites((prev) => prev.filter((fav) => fav.id !== id));
+      await toggleFavorite(comicId);
+
+      setFavorites((prev) => prev.filter((fav) => fav.id !== comicId));
+
       toast.success("Eliminado", {
         description: `${title} ha sido quitado de tu biblioteca.`,
       });
     } catch (error) {
+      console.error("Error al quitar favorito:", error);
       toast.error("No se pudo eliminar");
     }
   };

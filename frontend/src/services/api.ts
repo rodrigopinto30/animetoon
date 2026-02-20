@@ -129,22 +129,31 @@ export const signup = async (userData: any) => {
   return response.json();
 };
 
-export const toggleFavorite = async (comicId: string, token?: string) => {
-  const baseUrl = typeof window === 'undefined' ? 'http://backend:3001' : 'http://localhost:3001';
-  
+export const toggleFavorite = async (comicId: string) => {
+  const token = getCookie("token");
+    const baseUrl = typeof window === 'undefined' ? 'http://backend:3001' : 'http://localhost:3001';
+
   const response = await fetch(`${baseUrl}/favorites/${comicId}`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ comicId }), 
   });
 
+  const contentType = response.headers.get("content-type");
+  let data = {};
+  
+  if (contentType && contentType.includes("application/json")) {
+    data = await response.json();
+  }
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error('Error del servidor:', errorData); 
-    throw new Error('No se pudo actualizar favoritos');}
-  return response.json();
+    throw data; 
+  }
+
+  return data;
 };
 
 export const getMyFavorites = async () => {
