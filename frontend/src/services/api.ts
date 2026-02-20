@@ -1,22 +1,8 @@
 import { LoginValues } from "@/lib/validations/auth";
-import { ComicDetail, EpisodeDetail } from "@/lib/validations/comic";
 import Cookies from 'js-cookie';
 import { getCookie } from "cookies-next";
+import { PaginatedComics } from "@/lib/validations/comic";
 
-export interface Comic {
-  id: string;
-  title: string;
-  genre: string;
-  coverImage: string;
-  description: string;
-}
-
-export interface PaginatedComics {
-  items: Comic[];
-  total: number;
-  page: number;
-  lastPage: number;
-}
 
 export const getComics = async (filters: { title?: string, genre?: string, page?: number }): Promise<PaginatedComics> => {
   const { title, genre, page = 1 } = filters;
@@ -41,8 +27,6 @@ export const getComics = async (filters: { title?: string, genre?: string, page?
   
   return response.json();
 };
-
-
 
 export const getComicById = async (id: string) => {
   // 1. Detectar entorno

@@ -7,8 +7,10 @@ import { Episode } from './entities/episode.entity';
 import { PassportModule } from '@nestjs/passport'; 
 import { JwtOptionalGuard } from '../auth/guards/jwt-optional.guard';
 import { Favorite } from '../favorites/entities/favorite.entity'; 
+import { Page } from './entities/page.entity';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Comic, Episode, Favorite]),
+  imports: [TypeOrmModule.forFeature([Comic, Episode, Favorite, Page]),
   PassportModule.register({ defaultStrategy: 'jwt' }),
 ],
   providers: [ComicsService, JwtOptionalGuard],
