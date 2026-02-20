@@ -33,15 +33,25 @@ export class FavoritesService {
   }
 
   async getUserFavorites(userId: string) {
-  const favorites = await this.favoriteRepository.find({
-    where: { user: { id: userId } },
-    relations: ['comic'],
-  });
+    const favorites = await this.favoriteRepository.find({
+      where: { user: { id: userId } },
+      relations: ['comic', 'comic.author'],
+      order: { createdAt: 'DESC' }
+    });
 
-  return favorites.map(fav => ({
-    ...fav.comic,
-    favoriteId: fav.id, 
-  }));
-}
+    return favorites.map((fav: any) => {
+      if (!fav.comic) return null;
+      
+      return {
+        id: fav.comic.id,
+        title: fav.comic.title,
+        description: fav.comic.description,
+        coverImage: fav.comic.coverImage,
+        genre: fav.comic.genre,
+        favoriteId: fav.id,
+        createdAt: fav.createdAt
+      };
+    }).filter(item => item !== null);
+  }
 
 }
